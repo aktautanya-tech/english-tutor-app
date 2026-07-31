@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web - English Tutor with Teacher Dashboard</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -96,7 +98,7 @@
     <div id="app" class="w-full h-full max-w-[1600px] flex overflow-hidden shadow-2xl relative bg-slate-900 border border-slate-800">
         
         <!-- SIDEBAR (CHATS LIST) -->
-        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full z-20 transition-all duration-300">
+        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex-col h-full z-20 transition-all duration-300 hidden md:flex shrink-0">
             <!-- Sidebar Header -->
             <div class="p-3 bg-slate-900 flex items-center justify-between border-b border-slate-800 gap-2">
                 <button id="menu-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
@@ -141,14 +143,14 @@
         </aside>
 
         <!-- MAIN CHAT AREA -->
-        <main id="chat-window" class="flex-1 flex flex-col h-full relative bg-slate-950">
+        <main id="chat-window" class="flex-1 flex flex-col h-full w-full relative bg-slate-950 min-w-0">
             <!-- Chat Top Header -->
-            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between z-10">
-                <div class="flex items-center gap-3 cursor-pointer" id="header-user-info">
-                    <button id="back-to-list" class="md:hidden w-8 h-8 rounded-full hover:bg-slate-800 text-slate-400 flex items-center justify-center">
+            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-3 md:px-4 flex items-center justify-between z-10 gap-2">
+                <div class="flex items-center gap-2 md:gap-3 cursor-pointer min-w-0" id="header-user-info">
+                    <button id="back-to-list" class="md:hidden w-8 h-8 rounded-full hover:bg-slate-800 text-slate-400 flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <div id="header-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-base shadow">
                             EN
                         </div>
@@ -435,6 +437,9 @@
         let currentFolder = 'all';
 
         // DOM elements
+        const sidebarEl = document.getElementById('sidebar');
+        const chatWindowEl = document.getElementById('chat-window');
+        const backToListBtn = document.getElementById('back-to-list');
         const chatListEl = document.getElementById('chat-list');
         const messagesContainer = document.getElementById('messages-container');
         const messageForm = document.getElementById('message-form');
@@ -445,6 +450,35 @@
         const openTeacherBtn = document.getElementById('open-teacher-btn');
         const closeTeacherModal = document.getElementById('close-teacher-modal');
         const teacherLogTable = document.getElementById('teacher-log-table');
+
+        // Mobile View Controllers
+        function showSidebarMobile() {
+            if (window.innerWidth < 768) {
+                sidebarEl.classList.remove('hidden');
+                sidebarEl.classList.add('flex');
+                chatWindowEl.classList.add('hidden');
+                chatWindowEl.classList.remove('flex');
+            }
+        }
+
+        function showChatMobile() {
+            if (window.innerWidth < 768) {
+                sidebarEl.classList.add('hidden');
+                sidebarEl.classList.remove('flex');
+                chatWindowEl.classList.remove('hidden');
+                chatWindowEl.classList.add('flex');
+            }
+        }
+
+        if (backToListBtn) {
+            backToListBtn.addEventListener('click', showSidebarMobile);
+        }
+
+        // Initialize Telegram Mini App SDK if available
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
 
         // Gemini Evaluation API Call
         async function evaluateTranslationWithGemini(userTranslation, currentTask) {
@@ -719,20 +753,33 @@
         // Initialize Chat List
         function renderChatList() {
             chatListEl.innerHTML = `
-                <div class="flex items-center gap-3 p-3 bg-slate-800/90 border-l-4 border-blue-500 cursor-pointer">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow">EN</div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-sm text-slate-200">English Grammar Bot 🇬🇧</h4>
-                        <p class="text-xs text-blue-400">онлайн • Репетитор AI</p>
+                <div onclick="showChatMobile()" class="flex items-center gap-3 p-3 bg-slate-800/90 border-l-4 border-blue-500 cursor-pointer">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow shrink-0">EN</div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-sm text-slate-200 truncate">English Grammar Bot 🇬🇧</h4>
+                        <p class="text-xs text-blue-400 truncate">онлайн • Репетитор AI</p>
                     </div>
                 </div>
             `;
         }
 
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebarEl.classList.remove('hidden');
+                sidebarEl.classList.add('flex');
+                chatWindowEl.classList.remove('hidden');
+                chatWindowEl.classList.add('flex');
+            } else {
+                showChatMobile();
+            }
+        });
+
         // Initial setup
         renderChatList();
         renderMessages();
         renderTeacherLogs();
+        showChatMobile();
     </script>
 </body>
 </html>
