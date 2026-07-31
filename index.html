@@ -9,370 +9,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        tg: {
-                            bg: '#0f172a',
-                            sidebar: '#1e293b',
-                            header: '#1e293b',
-                            bubbleUser: '#2563eb',
-                            bubbleOther: '#334155',
-                            accent: '#3b82f6',
-                            hover: '#334155',
-                            textMuted: '#94a3b8'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            user-select: none;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.2);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.4);
-        }
-
-        .tg-wallpaper {
-            background-color: #0b141a;
-            background-image: radial-gradient(#1e293b 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-
-        .bubble-out::after {
-            content: "";
-            position: absolute;
-            right: -6px;
-            bottom: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 0 10px 10px;
-            border-color: transparent transparent #2563eb transparent;
-        }
-        .bubble-in::before {
-            content: "";
-            position: absolute;
-            left: -6px;
-            bottom: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 10px 10px 0;
-            border-color: transparent #334155 transparent transparent;
-        }
-
-        .tg-inline-btn {
-            background-color: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(51, 65, 85, 0.8);
-            transition: all 0.2s ease;
-        }
-        .tg-inline-btn:hover {
-            background-color: rgba(37, 99, 235, 0.3);
-            border-color: #3b82f6;
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden flex flex-col justify-center items-center">
-
-    <div id="app" class="w-full h-full max-w-[1600px] flex overflow-hidden shadow-2xl relative bg-slate-900 border border-slate-800">
-        
-        <!-- SIDEBAR (CHATS LIST) -->
-        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full z-20 transition-all duration-300 shrink-0">
-            <!-- Sidebar Header -->
-            <div class="p-3 bg-slate-900 flex items-center justify-between border-b border-slate-800 gap-2">
-                <button id="menu-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                    <input type="text" id="search-chat" placeholder="Поиск..." 
-                           class="w-full bg-slate-800 text-slate-200 text-sm pl-9 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition placeholder-slate-500">
-                </div>
-            </div>
-
-            <!-- Categories Tabs -->
-            <div class="flex border-b border-slate-800 text-xs font-semibold px-2 text-slate-400 overflow-x-auto no-scrollbar">
-                <button class="folder-tab active px-4 py-2.5 border-b-2 border-blue-500 text-blue-400 flex items-center gap-1.5 shrink-0" data-folder="all">
-                    <span>Все</span>
-                    <span class="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full" id="total-unread-badge">0</span>
-                </button>
-                <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="personal">
-                    <span>Студенты</span>
-                </button>
-                <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="bots">
-                    <span>Боты</span>
-                </button>
-            </div>
-
-            <!-- Chat List Container -->
-            <div id="chat-list" class="flex-1 overflow-y-auto divide-y divide-slate-800/40">
-                <!-- Dynamic Chat List Items -->
-            </div>
-
-            <!-- Sidebar Footer Status -->
-            <div class="p-2.5 bg-slate-950/60 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center px-4">
-                <span class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Telegram Web v2.4</span>
-                </span>
-                <button id="open-teacher-btn-sidebar" class="hover:text-purple-400 flex items-center gap-1 text-slate-400">
-                    <i class="fa-solid fa-graduation-cap"></i> Учителю
-                </button>
-            </div>
-        </aside>
-
-        <!-- MAIN CHAT AREA -->
-        <main id="chat-window" class="flex-1 hidden md:flex flex-col h-full w-full relative bg-slate-950 min-w-0">
-            <!-- Chat Top Header -->
-            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-3 md:px-4 flex items-center justify-between z-10 gap-2 shrink-0">
-                <div class="flex items-center gap-2 md:gap-3 cursor-pointer min-w-0" id="header-user-info">
-                    <button id="back-to-list" class="md:hidden w-8 h-8 rounded-full hover:bg-slate-800 text-slate-400 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-                    <div class="relative shrink-0">
-                        <div id="header-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-base shadow">
-                            EN
-                        </div>
-                        <span id="header-online-indicator" class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
-                    </div>
-                    <div class="truncate">
-                        <h2 id="header-name" class="font-semibold text-slate-100 text-sm md:text-base leading-tight truncate">English Grammar Bot 🇬🇧</h2>
-                        <p id="header-status" class="text-xs text-blue-400 truncate">онлайн • Репетитор AI (4 класс)</p>
-                    </div>
-                </div>
-
-                <!-- Learning Stats Bar & Teacher Button -->
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="hidden sm:flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50 text-xs">
-                        <div class="flex items-center gap-1.5 text-emerald-400 font-medium">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <span id="stat-correct">0</span>
-                        </div>
-                        <div class="h-3 w-px bg-slate-700"></div>
-                        <div class="flex items-center gap-1.5 text-amber-400 font-medium">
-                            <i class="fa-solid fa-fire"></i>
-                            <span id="stat-streak">0 стрик</span>
-                        </div>
-                        <div class="h-3 w-px bg-slate-700"></div>
-                        <div class="flex items-center gap-1.5 text-indigo-400 font-medium" title="Время на уроке">
-                            <i class="fa-regular fa-clock"></i>
-                            <span id="stat-timer">00:00</span>
-                        </div>
-                        <div class="h-3 w-px bg-slate-700"></div>
-                        <div class="flex items-center gap-1 text-slate-400">
-                            <span id="active-tense-badge" class="bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded-md font-semibold text-[11px]">
-                                Все времена
-                            </span>
-                        </div>
-                    </div>
-
-                    <button id="open-teacher-btn" class="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        <span class="hidden sm:inline">Панель Учителя</span>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Tense Toolbar Panel -->
-            <div id="grammar-bar" class="bg-slate-900/90 border-b border-slate-800 px-3 py-2 flex flex-wrap gap-1.5 items-center text-xs overflow-x-auto shrink-0">
-                <span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider shrink-0 mr-1">Время:</span>
-                <button class="tense-selector-btn active bg-blue-600 text-white px-2.5 py-1 rounded-lg transition" data-tense="ALL">
-                    🔀 Все Времена
-                </button>
-                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Present Simple">
-                    Present Simple
-                </button>
-                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Present Continuous">
-                    Present Continuous
-                </button>
-                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Past Simple">
-                    Past Simple
-                </button>
-                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Future Simple">
-                    Future Simple
-                </button>
-
-                <div class="h-4 w-px bg-slate-700 mx-1"></div>
-
-                <span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider shrink-0 mr-1">Форма:</span>
-                <button class="form-selector-btn active bg-indigo-600 text-white px-2 py-1 rounded-lg transition" data-form="ALL">
-                    ⚡ Все (+,-,?)
-                </button>
-                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Affirmative">
-                    + Утверждение
-                </button>
-                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Negative">
-                    - Отрицание
-                </button>
-                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Interrogative">
-                    ? Вопрос
-                </button>
-            </div>
-
-            <!-- Messages Container -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 tg-wallpaper relative">
-                <!-- Messages inserted dynamically -->
-            </div>
-
-            <!-- Emoji Picker Drawer -->
-            <div id="emoji-picker" class="hidden absolute bottom-20 left-4 z-30 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-3 w-72 grid grid-cols-6 gap-2 text-xl">
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">😊</span>
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">😂</span>
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">👍</span>
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">❤️</span>
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🔥</span>
-                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🎉</span>
-            </div>
-
-            <!-- Input Area Footer -->
-            <footer class="p-3 bg-slate-900 border-t border-slate-800 relative z-10 shrink-0">
-                <form id="message-form" class="flex items-center gap-2 max-w-4xl mx-auto">
-                    <button type="button" id="attach-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 flex items-center justify-center transition">
-                        <i class="fa-solid fa-paperclip text-lg"></i>
-                    </button>
-                    <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc">
-
-                    <div class="flex-1 bg-slate-800/80 rounded-2xl flex items-center px-3 border border-slate-700/50 focus-within:border-blue-500 transition">
-                        <button type="button" id="emoji-btn" class="text-slate-400 hover:text-amber-400 mr-2 transition">
-                            <i class="fa-regular fa-face-smile text-xl"></i>
-                        </button>
-                        <input type="text" id="message-input" placeholder="Написать перевод или спросить слово..." 
-                               autocomplete="off"
-                               class="w-full bg-transparent text-slate-100 py-3 text-sm focus:outline-none placeholder-slate-500">
-                    </div>
-
-                    <button type="submit" id="send-btn" class="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition shadow-lg shadow-blue-600/30">
-                        <i id="send-icon" class="fa-solid fa-paper-plane text-sm"></i>
-                    </button>
-                </form>
-            </footer>
-        </main>
-
-        <!-- TEACHER DASHBOARD MODAL PANEL -->
-        <div id="teacher-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-                <!-- Modal Header -->
-                <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center">
-                            <i class="fa-solid fa-graduation-cap text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-slate-100 text-base">Панель Учителя / Мониторинг</h3>
-                            <p class="text-xs text-slate-400">Отслеживание ответов и прогресса ученика в реальном времени</p>
-                        </div>
-                    </div>
-                    <button id="close-teacher-modal" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <!-- Teacher Controls & Stats Bar -->
-                <div class="p-4 bg-slate-950/50 border-b border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-emerald-400"><i class="fa-solid fa-bullseye"></i></div>
-                        <div>
-                            <span class="text-slate-400 block">Точность ученика</span>
-                            <span class="font-bold text-slate-100 text-base" id="teacher-accuracy-val">100%</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-blue-400"><i class="fa-solid fa-tasks"></i></div>
-                        <div>
-                            <span class="text-slate-400 block">Всего выполнено</span>
-                            <span class="font-bold text-slate-100 text-base" id="teacher-total-answers">0 карточек</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-amber-400"><i class="fa-solid fa-fire"></i></div>
-                        <div>
-                            <span class="text-slate-400 block">Текущий Стрик</span>
-                            <span class="font-bold text-amber-300 text-base" id="teacher-streak-val">0</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-purple-400"><i class="fa-solid fa-stopwatch"></i></div>
-                        <div>
-                            <span class="text-slate-400 block">Время на уроке</span>
-                            <span class="font-bold text-purple-300 text-base" id="teacher-lesson-time">00:00:00</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-indigo-400"><i class="fa-solid fa-user-check"></i></div>
-                        <div>
-                            <span class="text-slate-400 block">Ученик</span>
-                            <span class="font-bold text-slate-100 text-xs" id="teacher-student-name">Дархан (4 класс)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Teacher Main Content Area -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                        <h4 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-purple-400"></i>
-                            Журнал ответов текущей сессии
-                        </h4>
-                        <div class="flex items-center gap-2">
-                            <button id="clear-teacher-logs" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-trash-can"></i> Очистить лог
-                            </button>
-                            <button id="export-report-btn" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-file-export"></i> Экспорт
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-slate-300">
-                            <thead class="bg-slate-800/90 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-700">
-                                <tr>
-                                    <th class="p-3">Время</th>
-                                    <th class="p-3">Тема / Форма</th>
-                                    <th class="p-3">Задание (RU)</th>
-                                    <th class="p-3">Ответ ученика (EN)</th>
-                                    <th class="p-3">Эталон перевода</th>
-                                    <th class="p-3 text-center">Результат</th>
-                                </tr>
-                            </thead>
-                            <tbody id="teacher-log-table" class="divide-y divide-slate-800">
-                                <!-- Log Items Injected via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        // Global Telegram WebApp Setup
+        // Global Telegram WebApp SDK
         if (window.Telegram && window.Telegram.WebApp) {
             try {
                 window.Telegram.WebApp.ready();
@@ -386,85 +23,335 @@
         const studentName = "Дархан";
         let activeChatId = 'english-bot';
         let teacherLogs = [];
-        let stats = { correct: 0, streak: 0, total: 0 };
+        let stats = { correct: 0, streak: 0, total: 0, maxStreak: 0 };
         let activeTenseSetting = "ALL";
         let activeFormSetting = "ALL";
         let sessionSeconds = 0;
         let timerInterval = null;
+        let isLessonActive = false;
+        let lessonTarget = 20;
+        let completedTaskIndices = new Set(); // Хранилище пройденных предложений для исключения повторов
 
-        // 4th Grade Tasks Data Bank
+        // 4th Grade Tasks Data Bank: 20 Examples per Tense & Form (12 Sections x 20 = 240 Cards Total)
         const grade4Tasks = [
-            // Present Simple
+            // ================= PRESENT SIMPLE =================
+            // Affirmative (+) [20 Sentences]
             { russian: "Я люблю кошек.", english: "I like cats.", tense: "Present Simple", form: "Affirmative (+)" },
-            { russian: "Она живет в большим доме.", english: "She lives in a big house.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Она живет в большом доме.", english: "She lives in a big house.", tense: "Present Simple", form: "Affirmative (+)" },
             { russian: "Мы играем в футбол каждый день.", english: "We play football every day.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Он читает книги по вечерам.", english: "He reads books in the evening.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Они ходят в школу утром.", english: "They go to school in the morning.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Моя сестра хорошо поет.", english: "My sister sings well.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Кот спит на диване.", english: "The cat sleeps on the sofa.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Я ем яблоко каждый день.", english: "I eat an apple every day.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Мы смотрим телевизор вечером.", english: "We watch TV in the evening.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Он помогает маме.", english: "He helps his mother.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Мой друг живет в Алматы.", english: "My friend lives in Almaty.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Собака лает на птиц.", english: "The dog barks at birds.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Они любят мороженое.", english: "They like ice cream.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Ученики пишут тесты по пятницам.", english: "Students write tests on Fridays.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Анна пьет молоко по утрам.", english: "Anna drinks milk in the morning.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Птицы летают высоко.", english: "Birds fly high.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Я чищу зубы дважды в день.", english: "I brush my teeth twice a day.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Мой папа водит машину.", english: "My father drives a car.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Летом мы плаваем в реке.", english: "We swim in the river in summer.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Она отлично говорит по-английски.", english: "She speaks English very well.", tense: "Present Simple", form: "Affirmative (+)" },
+
+            // Negative (-) [20 Sentences]
             { russian: "Он не ест яблоки.", english: "He does not eat apples.", tense: "Present Simple", form: "Negative (-)" },
             { russian: "Я не смотрю ТВ утром.", english: "I do not watch TV in the morning.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Мы не играем в хоккей.", english: "We do not play hockey.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Она не любит рыбу.", english: "She does not like fish.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Они не живут в Лондоне.", english: "They do not live in London.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Мой брат не пьет кофе.", english: "My brother does not drink coffee.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Собака не кусается.", english: "The dog does not bite.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Я не хочу спать.", english: "I do not want to sleep.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Мы не ходим в школу по воскресеньям.", english: "We do not go to school on Sundays.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Она не читает комиксы.", english: "She does not read comics.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Он не знает ответ.", english: "He does not know the answer.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Птицы не летают ночью.", english: "Birds do not fly at night.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Я не рисую на стенах.", english: "I do not draw on walls.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Моя мама не водит автобус.", english: "My mother does not drive a bus.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Дети не слушают громкую музыку.", english: "Children do not listen to loud music.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Учитель не кричит на нас.", english: "The teacher does not shout at us.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Мы не едим суп вечером.", english: "We do not eat soup in the evening.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Кот не любит воду.", english: "The cat does not like water.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Она не забывает домашнее задание.", english: "She does not forget homework.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Я не прихожу поздно в школу.", english: "I do not come late to school.", tense: "Present Simple", form: "Negative (-)" },
+
+            // Interrogative (?) [20 Sentences]
             { russian: "Ты любишь собак?", english: "Do you like dogs?", tense: "Present Simple", form: "Interrogative (?)" },
-            
-            // Present Continuous
+            { russian: "Она живет здесь?", english: "Does she live here?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Они играют в шахматы?", english: "Do they play chess?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Он смотрит фильмы?", english: "Does he watch movies?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Ты пьешь сок по утрам?", english: "Do you drink juice in the morning?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Твоя сестра читает книги?", english: "Does your sister read books?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Мы идем в парк?", english: "Do we go to the park?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Ты знаешь этого мальчика?", english: "Do you know this boy?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Кот спит здесь?", english: "Does the cat sleep here?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Они любят плавать?", english: "Do they like to swim?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Ты помогаешь папе?", english: "Do you help your father?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Она говорит по-английски?", english: "Does she speak English?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Твой друг играет на гитаре?", english: "Does your friend play the guitar?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Вы учите стихи?", english: "Do you learn poems?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Он делает зарядку?", english: "Does he do exercises?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Твои родители работают в офисе?", english: "Do your parents work in an office?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Ты любишь математику?", english: "Do you like maths?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Собака бегает быстро?", english: "Does the dog run fast?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Они смотрят мультики?", english: "Do they watch cartoons?", tense: "Present Simple", form: "Interrogative (?)" },
+            { russian: "Ты ходишь в бассейн?", english: "Do you go to the swimming pool?", tense: "Present Simple", form: "Interrogative (?)" },
+
+            // ================= PRESENT CONTINUOUS =================
+            // Affirmative (+) [20 Sentences]
             { russian: "Она сейчас читает книгу.", english: "She is reading a book now.", tense: "Present Continuous", form: "Affirmative (+)" },
             { russian: "Они сейчас бегают в парке.", english: "They are running in the park now.", tense: "Present Continuous", form: "Affirmative (+)" },
-            { russian: "Я не сплю сейчас.", english: "I am not sleeping now.", tense: "Present Continuous", form: "Negative (-)" },
-            { russian: "Ты сейчас рисуешь?", english: "Are you drawing now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Я сейчас делаю домашнее задание.", english: "I am doing homework now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Мама сейчас готовит обед.", english: "Mum is cooking lunch now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Папа сейчас чинит велосипед.", english: "Dad is fixing a bike now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Кот сейчас спит на столе.", english: "The cat is sleeping on the table now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Дети сейчас играют в игру.", english: "Children are playing a game now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Мы сейчас слушаем музыку.", english: "We are listening to music now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Он сейчас рисует картину.", english: "He is drawing a picture now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Я сейчас пью чай.", english: "I am drinking tea now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Учитель сейчас объясняет урок.", english: "The teacher is explaining the lesson now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Мой друг сейчас смотрит мультик.", english: "My friend is watching a cartoon now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Птицы сейчас поют в саду.", english: "Birds are singing in the garden now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Она сейчас пишет письмо.", english: "She is writing a letter now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Мы сейчас идём в кино.", english: "We are going to the cinema now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Мальчик сейчас моет руки.", english: "The boy is washing his hands now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Они сейчас танцуют.", english: "They are dancing now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Я сейчас жду автобус.", english: "I am waiting for the bus now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Собака сейчас играет с мячом.", english: "The dog is playing with a ball now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Девочка сейчас ест яблоко.", english: "The girl is eating an apple now.", tense: "Present Continuous", form: "Affirmative (+)" },
 
-            // Past Simple
+            // Negative (-) [20 Sentences]
+            { russian: "Я не сплю сейчас.", english: "I am not sleeping now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Она не читает книгу сейчас.", english: "She is not reading a book now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Они не бегают сейчас.", english: "They are not running now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Он не смотрит телевизор сейчас.", english: "He is not watching TV now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Мы не играем в футбол сейчас.", english: "We are not playing football now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Кот не пьет молоко сейчас.", english: "The cat is not drinking milk now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Мама не готовит сейчас.", english: "Mum is not cooking now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Я не пишу тест сейчас.", english: "I am not writing a test now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Они не слушают учителя сейчас.", english: "They are not listening to the teacher now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Мой брат не рисует сейчас.", english: "My brother is not drawing now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Дети не плачут сейчас.", english: "Children are not crying now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Ты не слушаешь меня сейчас.", english: "You are not listening to me now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Она не танцует сейчас.", english: "She is not dancing now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Мы не поем песню сейчас.", english: "We are not singing a song now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Папа не работает сейчас.", english: "Dad is not working now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Птицы не летают сейчас.", english: "Birds are not flying now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Ученики не делают зарядку сейчас.", english: "Students are not doing exercises now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Девочка не ест суп сейчас.", english: "The girl is not eating soup now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Собака не лает сейчас.", english: "The dog is not barking now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Я не иду домой сейчас.", english: "I am not going home now.", tense: "Present Continuous", form: "Negative (-)" },
+
+            // Interrogative (?) [20 Sentences]
+            { russian: "Ты сейчас рисуешь?", english: "Are you drawing now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Она сейчас спит?", english: "Is she sleeping now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Они сейчас играют?", english: "Are they playing now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Он сейчас читает книгу?", english: "Is he reading a book now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Мама сейчас готовит?", english: "Is mum cooking now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Ты сейчас пьешь сок?", english: "Are you drinking juice now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Мы сейчас идем в школу?", english: "Are we going to school now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Кот сейчас ест?", english: "Is the cat eating now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Твой папа сейчас работает?", english: "Is your father working now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Они сейчас смотрят фильм?", english: "Are they watching a movie now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Ты сейчас делаешь уроки?", english: "Are you doing homework now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Дети сейчас играют в парке?", english: "Are children playing in the park now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Она сейчас пишет письмо?", english: "Is she writing a letter now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Ты сейчас слушаешь музыку?", english: "Are you listening to music now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Учитель сейчас говорит?", english: "Is the teacher talking now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Собака сейчас бегает?", english: "Is the dog running now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Они сейчас пьют чай?", english: "Are they drinking tea now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Ты сейчас ждешь друга?", english: "Are you waiting for a friend now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Девочка сейчас поет?", english: "Is the girl singing now?", tense: "Present Continuous", form: "Interrogative (?)" },
+            { russian: "Вы сейчас играете в футбол?", english: "Are you playing football now?", tense: "Present Continuous", form: "Interrogative (?)" },
+
+            // ================= PAST SIMPLE =================
+            // Affirmative (+) [20 Sentences]
             { russian: "Вчера я ходил в школу.", english: "I went to school yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
             { russian: "Мы смотрели мультик вчера.", english: "We watched a cartoon yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
-            { russian: "Она не играла в теннис вчера.", english: "She did not play tennis yesterday.", tense: "Past Simple", form: "Negative (-)" },
-            { russian: "Ты видел моего кота вчера?", english: "Did you see my cat yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Она прочитала интересную книгу.", english: "She read an interesting book.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Он купил новый мяч вчера.", english: "He bought a new ball yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Они играли в футбол вчера.", english: "They played football yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Я видел красивую птицу.", english: "I saw a beautiful bird.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Мама приготовила торт вчера.", english: "Mum cooked a cake yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Мы плавали в бассейне прошлым летом.", english: "We swam in the pool last summer.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Папа починил мой велосипед.", english: "Dad fixed my bike.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Кот поспал на диване.", english: "The cat slept on the sofa.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Вчера я нарисовал дом.", english: "I drew a house yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Она помогла маме вчера.", english: "She helped her mother yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Они ходили в зоопарк в воскресенье.", english: "They went to the zoo on Sunday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Я выпил стакан молока.", english: "I drank a glass of milk.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Ученики написали диктант вчера.", english: "Students wrote a dictation yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Мой друг позвонил мне вчера.", english: "My friend called me yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Мы гуляли в парке вчера.", english: "We walked in the park yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Она потеряла свои ключи.", english: "She lost her keys.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Он съел вкусное яблоко.", english: "He ate a delicious apple.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Дети отлично провели время.", english: "Children had a great time.", tense: "Past Simple", form: "Affirmative (+)" },
 
-            // Future Simple
+            // Negative (-) [20 Sentences]
+            { russian: "Она не играла в теннис вчера.", english: "She did not play tennis yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Я не смотрел ТВ вчера.", english: "I did not watch TV yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Мы не ходили в зоопарк вчера.", english: "We did not go to the zoo yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Он не сделал домашнее задание.", english: "He did not do homework.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Они не ели рыбу вчера.", english: "They did not eat fish yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Я не видел твоего кота вчера.", english: "I did not see your cat yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Мама не пекла торт вчера.", english: "Mum did not bake a cake yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Мы не играли в футбол прошлым летом.", english: "We did not play football last summer.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Папа не купил новую машину.", english: "Dad did not buy a new car.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Кот не спал в коробке.", english: "The cat did not sleep in the box.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Вчера я не рисовал картину.", english: "I did not draw a picture yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Она не написала письмо вчера.", english: "She did not write a letter yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Они не ходили в музей.", english: "They did not go to the museum.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Я не пил сок вчера.", english: "I did not drink juice yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Дети не плакали вчера.", english: "Children did not cry yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Мой друг не пришел в школу.", english: "My friend did not come to school.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Мы не гуляли в парке вечером.", english: "We did not walk in the park in the evening.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Она не потеряла свой портфель.", english: "She did not lose her schoolbag.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Он не съел мороженое.", english: "He did not eat ice cream.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Учитель не задал домашнее задание.", english: "The teacher did not give homework.", tense: "Past Simple", form: "Negative (-)" },
+
+            // Interrogative (?) [20 Sentences]
+            { russian: "Ты видел моего кота вчера?", english: "Did you see my cat yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Вчера ты ходил в школу?", english: "Did you go to school yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Она прочитала книгу вчера?", english: "Did she read the book yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Они играли в футбол вчера?", english: "Did they play football yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Он купил новый мяч?", english: "Did he buy a new ball?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Ты смотрел мультик вчера?", english: "Did you watch a cartoon yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Мама приготовила обед вчера?", english: "Did mum cook lunch yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Вы плавали в реке прошлым летом?", english: "Did you swim in the river last summer?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Твой папа починил велосипед?", english: "Did your father fix the bike?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Кот спал на кровати?", english: "Did the cat sleep on the bed?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Ты нарисовал собаку вчера?", english: "Did you draw a dog yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Она помогла бабушке вчера?", english: "Did she help her grandmother yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Они ходили в парк в воскресенье?", english: "Did they go to the park on Sunday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Ты выпил молоко вчера?", english: "Did you drink milk yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Ученики написали тест?", english: "Did students write the test?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Твой друг звонил тебе вчера?", english: "Did your friend call you yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Вы гуляли вчера вечером?", english: "Did you walk yesterday evening?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Она потеряла ручку вчера?", english: "Did she lose her pen yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Он съел торт вчера?", english: "Did he eat the cake yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+            { russian: "Ты хорошо поспал ночью?", english: "Did you sleep well at night?", tense: "Past Simple", form: "Interrogative (?)" },
+
+            // ================= FUTURE SIMPLE =================
+            // Affirmative (+) [20 Sentences]
             { russian: "Завтра я буду играть в игру.", english: "I will play a game tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
             { russian: "Они поедут в зоопарк завтра.", english: "They will go to the zoo tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Она прочитает эту книгу завтра.", english: "She will read this book tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мы пойдем в парк в воскресенье.", english: "We will go to the park on Sunday.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Он купит новую игрушку завтра.", english: "He will buy a new toy tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Я помогу маме вечером.", english: "I will help mum in the evening.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мама приготовит пиццу завтра.", english: "Mum will cook pizza tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мы будем плавать в море летом.", english: "We will swim in the sea in summer.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Папа починит машину завтра.", english: "Dad will fix the car tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мой друг придет в гости завтра.", english: "My friend will come to visit tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Завтра я нарисую рисунок.", english: "I will draw a picture tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Они будут играть в футбол завтра.", english: "They will play football tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Она напишет письмо завтра.", english: "She will write a letter tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Я выпью сок вечером.", english: "I will drink juice in the evening.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Ученики сдадут тесты завтра.", english: "Students will pass the tests tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мы посмотрим новый фильм вечером.", english: "We will watch a new movie in the evening.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Учитель объяснит правило завтра.", english: "The teacher will explain the rule tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Кот будет спать на диване.", english: "The cat will sleep on the sofa.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Он съест яблоко на обед.", english: "He will eat an apple for lunch.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Мы отлично проведем время завтра.", english: "We will have a great time tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+
+            // Negative (-) [20 Sentences]
             { russian: "Он не пойдет гулять завтра.", english: "He will not go for a walk tomorrow.", tense: "Future Simple", form: "Negative (-)" },
-            { russian: "Ты будешь пить сок завтра?", english: "Will you drink juice tomorrow?", tense: "Future Simple", form: "Interrogative (?)" }
+            { russian: "Я не буду смотреть ТВ завтра.", english: "I will not watch TV tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Они не поедут в зоопарк завтра.", english: "They will not go to the zoo tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Она не будет читать книгу завтра.", english: "She will not read a book tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Мы не будем играть в футбол завтра.", english: "We will not play football tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Я не забуду сделать уроки.", english: "I will not forget to do homework.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Мама не будет готовить суп завтра.", english: "Mum will not cook soup tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Мы не пойдем в школу в субботу.", english: "We will not go to school on Saturday.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Папа не купит этот мяч.", english: "Dad will not buy this ball.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Мой друг не придет завтра.", english: "My friend will not come tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Я не буду рисовать вечером.", english: "I will not draw in the evening.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Они не будут шуметь на уроке.", english: "They will not make noise in class.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Она не напишет письмо завтра.", english: "She will not write a letter tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Я не буду пить холодное молоко.", english: "I will not drink cold milk.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Дети не будут плакать.", english: "Children will not cry.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Мы не опоздаем в школу завтра.", english: "We will not be late for school tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Учитель не будет кричать.", english: "The teacher will not shout.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Кот не будет есть эту рыбу.", english: "The cat will not eat this fish.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Он не съест лимон.", english: "He will not eat a lemon.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Ты не пожалеешь об этом.", english: "You will not regret this.", tense: "Future Simple", form: "Negative (-)" },
+
+            // Interrogative (?) [20 Sentences]
+            { russian: "Ты будешь пить сок завтра?", english: "Will you drink juice tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Ты пойдешь в школу завтра?", english: "Will you go to school tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Она прочитает книгу завтра?", english: "Will she read the book tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Они поедут в зоопарк завтра?", english: "Will they go to the zoo tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Он купит новую игрушку?", english: "Will he buy a new toy?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Ты поможешь маме вечером?", english: "Will you help mum in the evening?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Мама приготовит торт завтра?", english: "Will mum cook a cake tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Вы будете плавать в море летом?", english: "Will you swim in the sea in summer?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Твой папа починит велосипед завтра?", english: "Will your father fix the bike tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Твой друг придет завтра?", english: "Will your friend come tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Ты нарисуешь кота завтра?", english: "Will you draw a cat tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Они будут играть в футбол завтра?", english: "Will they play football tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Она напишет тест завтра?", english: "Will she write the test tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Ты будешь смотреть мультик вечером?", english: "Will you watch a cartoon in the evening?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Мы пойдем в кино в воскресенье?", english: "Will we go to the cinema on Sunday?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Учитель придет завтра?", english: "Will the teacher come tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Вы будете учить слова завтра?", english: "Will you learn words tomorrow?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Кот будет спать здесь?", english: "Will the cat sleep here?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Он съест это яблоко?", english: "Will he eat this apple?", tense: "Future Simple", form: "Interrogative (?)" },
+            { russian: "Мы встретимся завтра?", english: "Will we meet tomorrow?", tense: "Future Simple", form: "Interrogative (?)" }
         ];
 
-        // Random Task Selector Helper
-        function getRandom4thGradeTask(tense = 'ALL', form = 'ALL') {
-            let filtered = grade4Tasks;
-            if (tense !== 'ALL') {
-                filtered = filtered.filter(t => t.tense === tense);
+        // Task Selector Helper with anti-repetition and retry logic
+        function getNextTask(tense = 'ALL', form = 'ALL', currentTask = null) {
+            let filtered = grade4Tasks.map((task, index) => ({ task, index })).filter(item => {
+                const t = item.task;
+                if (tense !== 'ALL' && t.tense !== tense) return false;
+                if (form !== 'ALL') {
+                    const formMap = {
+                        'Affirmative': 'Affirmative (+)',
+                        'Negative': 'Negative (-)',
+                        'Interrogative': 'Interrogative (?)'
+                    };
+                    const targetForm = formMap[form] || form;
+                    if (t.form !== targetForm) return false;
+                }
+                return true;
+            });
+
+            // Отфильтровываем карточки, которые ученик уже правильно ответил
+            let available = filtered.filter(item => !completedTaskIndices.has(item.index));
+
+            // Если все карточки этой категории уже пройдены, сбрасываем историю для категории
+            if (available.length === 0) {
+                filtered.forEach(item => completedTaskIndices.delete(item.index));
+                available = filtered;
             }
-            if (form !== 'ALL') {
-                const formMap = {
-                    'Affirmative': 'Affirmative (+)',
-                    'Negative': 'Negative (-)',
-                    'Interrogative': 'Interrogative (?)'
-                };
-                const targetForm = formMap[form] || form;
-                filtered = filtered.filter(t => t.form === targetForm);
+
+            // Исключаем текущую карточку, чтобы избежать подряд одинаковых (если есть выбор)
+            if (available.length > 1 && currentTask) {
+                available = available.filter(item => item.task !== currentTask);
             }
-            if (filtered.length === 0) filtered = grade4Tasks;
-            return filtered[Math.floor(Math.random() * filtered.length)];
+
+            const selected = available[Math.floor(Math.random() * available.length)];
+            return selected ? selected.task : grade4Tasks[0];
         }
 
-        // Dictionary vocabulary for 4th grade vocabulary lookup
+        // Vocabulary dictionary for 4th Grade
         const wordDictionary = {
-            "интересный": "interesting",
-            "интересная": "interesting",
-            "книга": "book",
-            "кошка": "cat",
-            "кот": "cat",
-            "собака": "dog",
-            "школа": "school",
-            "дом": "house",
-            "большой": "big",
-            "маленький": "small",
-            "яблоко": "apple",
-            "сок": "juice",
-            "друг": "friend",
-            "игра": "game",
-            "зоопарк": "zoo",
-            "футбол": "football",
-            "завтра": "tomorrow",
-            "вчера": "yesterday",
-            "сейчас": "now",
-            "рисовать": "draw",
-            "смотреть": "watch",
-            "читать": "read",
-            "ходить": "go"
+            "кот": "cat", "кошка": "cat", "собака": "dog", "щенок": "puppy", "котенок": "kitten",
+            "птица": "bird", "рыба": "fish", "медведь": "bear", "волк": "wolf", "лиса": "fox",
+            "заяц": "rabbit", "кролик": "rabbit", "обезьяна": "monkey", "слон": "elephant", "лев": "lion",
+            "тигр": "tiger", "лошадь": "horse", "корова": "cow", "свинья": "pig", "овца": "sheep",
+            "книга": "book", "тетрадь": "notebook", "ручка": "pen", "карандаш": "pencil",
+            "учитель": "teacher", "ученик": "student", "школа": "school", "урок": "lesson",
+            "мама": "mother / mum", "папа": "father / dad", "брат": "brother", "сестра": "sister",
+            "бабушка": "grandmother / grandma", "дедушка": "grandfather / grandpa",
+            "яблоко": "apple", "банан": "banana", "молоко": "milk", "сок": "juice", "вода": "water", "чай": "tea",
+            "читать": "read", "писать": "write", "рисовать": "draw", "смотреть": "watch / look",
+            "слушать": "listen", "играть": "play", "бегать": "run", "прыгать": "jump",
+            "плавать": "swim", "спать": "sleep", "есть": "eat", "пить": "drink"
         };
 
         const chatsData = [
@@ -486,11 +373,11 @@
                     { 
                         id: 1, 
                         sender: 'them', 
-                        text: `👋 **Привет, ${studentName}! Я твой репетитор по английскому языку (4 класс)!**\n\n📌 **ТЕКУЩЕЕ ЗАДАНИЕ**:\nВремя: **Present Continuous** | Форма: **Утвердительная (+)**\n\nПереведи предложение:\n👉 **"Она сейчас читает книгу."**`, 
+                        text: `👋 **Привет, ${studentName}! Я твой репетитор по английскому языку (4 класс)!**\n\n🎯 В базе **240 предложений** (по 20 на каждое время и форму).\nНажми **"🟢 Начать урок"** вверху экрана!`, 
                         time: '10:45',
                         inlineButtons: [
+                            { text: "🟢 Начать урок", action: "start_lesson" },
                             { text: "💡 Подсказка", action: "hint" },
-                            { text: "⏭️ Пропустить", action: "next" },
                             { text: "📐 Показать правило", action: "rule" }
                         ]
                     }
@@ -504,6 +391,124 @@
                 sessionSeconds++;
                 updateTimerDisplay();
             }, 1000);
+        }
+
+        function stopLessonTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function toggleLesson() {
+            if (!isLessonActive) {
+                startLesson();
+            } else {
+                finishLesson();
+            }
+        }
+
+        function startLesson() {
+            isLessonActive = true;
+            sessionSeconds = 0;
+            stats = { correct: 0, streak: 0, total: 0, maxStreak: 0 };
+            completedTaskIndices.clear();
+
+            document.getElementById('stat-correct').textContent = '0';
+            document.getElementById('stat-streak').textContent = '0 стрик';
+            document.getElementById('stat-progress').textContent = `0/${lessonTarget}`;
+            updateTimerDisplay();
+            startLessonTimer();
+
+            const btn = document.getElementById('lesson-toggle-btn');
+            const icon = document.getElementById('lesson-toggle-icon');
+            const text = document.getElementById('lesson-toggle-text');
+
+            if (btn) btn.className = "bg-rose-600 hover:bg-rose-500 text-white font-medium px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-md shadow-rose-600/30 animate-pulse";
+            if (icon) icon.className = "fa-solid fa-square text-xs";
+            if (text) text.textContent = "Завершить урок";
+
+            const chat = chatsData.find(c => c.id === 'english-bot');
+            if (chat) {
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                const task = getNextTask(activeTenseSetting, activeFormSetting);
+                chat.currentTask = task;
+
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: `🚀 **УРОК НАЧАТ!**\n📊 **Прогресс**: Карточка **1 из ${lessonTarget}**\n\n📌 **Тема**: **${task.tense}** (${task.form})\n\nПереведи предложение:\n👉 **"${task.russian}"**`,
+                    time: timeStr,
+                    inlineButtons: [
+                        { text: "💡 Подсказка", action: "hint" },
+                        { text: "⏭️ Пропустить", action: "next" },
+                        { text: "🏁 Завершить урок", action: "finish_lesson" }
+                    ]
+                });
+                renderMessages();
+            }
+        }
+
+        function finishLesson() {
+            if (!isLessonActive && sessionSeconds === 0 && stats.total === 0) {
+                alert("Урок ещё не начат!");
+                return;
+            }
+
+            isLessonActive = false;
+            stopLessonTimer();
+
+            const btn = document.getElementById('lesson-toggle-btn');
+            const icon = document.getElementById('lesson-toggle-icon');
+            const text = document.getElementById('lesson-toggle-text');
+
+            if (btn) btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-600/30";
+            if (icon) icon.className = "fa-solid fa-play text-xs";
+            if (text) text.textContent = "Начать урок";
+
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 100;
+            const hrs = Math.floor(sessionSeconds / 3600);
+            const mins = Math.floor((sessionSeconds % 3600) / 60);
+            const secs = sessionSeconds % 60;
+            const timeFormatted = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+            document.getElementById('summary-student-name').textContent = studentName;
+            document.getElementById('summary-time').textContent = timeFormatted;
+            document.getElementById('summary-cards').textContent = stats.total + ' карточек';
+            document.getElementById('summary-accuracy').textContent = accuracy + '%';
+            document.getElementById('summary-streak').textContent = stats.maxStreak;
+
+            let gradeMessage = "🌟 Отличная работа! Продолжай в том же духе!";
+            if (accuracy < 60) {
+                gradeMessage = "📘 Неплохо! Попробуй еще раз, чтобы закрепить правила!";
+            } else if (accuracy >= 90 && stats.total >= 5) {
+                gradeMessage = "🔥 Великолепный результат! 5/5 по английскому языку!";
+            }
+            document.getElementById('summary-grade-text').textContent = gradeMessage;
+
+            document.getElementById('lesson-summary-modal')?.classList.remove('hidden');
+
+            const chat = chatsData.find(c => c.id === 'english-bot');
+            if (chat) {
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: `🏁 **УРОК ЗАВЕРШЕН!**\n\n📊 **Итоги урока**:\n⏱️ Время: **${timeFormatted}**\n🎯 Решено карточек: **${stats.total}**\n✅ Правильно: **${stats.correct}** (${accuracy}%)\n🔥 Лучший стрик: **${stats.maxStreak}**\n\n${gradeMessage}`,
+                    time: timeStr,
+                    inlineButtons: [
+                        { text: "🟢 Начать новый урок", action: "start_lesson" }
+                    ]
+                });
+                renderMessages();
+            }
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('lesson-summary-modal')?.classList.add('hidden');
         }
 
         function updateTimerDisplay() {
@@ -521,7 +526,6 @@
             if (teacherTime) teacherTime.textContent = formattedFull;
         }
 
-        // Show/Hide Mobile View Handlers
         function showChatMobile() {
             const sidebar = document.getElementById('sidebar');
             const chatWindow = document.getElementById('chat-window');
@@ -544,7 +548,6 @@
             }
         }
 
-        // Render Chat List Item
         function renderChatList() {
             const chatListEl = document.getElementById('chat-list');
             if (!chatListEl) return;
@@ -575,7 +578,6 @@
             showChatMobile();
         }
 
-        // Formats Markdown bold / inline syntax for Telegram-like UI
         function formatMarkdown(text) {
             if (!text) return '';
             return text
@@ -584,7 +586,6 @@
                 .replace(/\n/g, '<br>');
         }
 
-        // Render Chat Messages
         function renderMessages() {
             const messagesContainer = document.getElementById('messages-container');
             const activeChat = chatsData.find(c => c.id === activeChatId);
@@ -621,7 +622,6 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Render Teacher Dashboard Logs
         function renderTeacherLogs() {
             const tableBody = document.getElementById('teacher-log-table');
             const accuracyVal = document.getElementById('teacher-accuracy-val');
@@ -663,7 +663,6 @@
             `).join('');
         }
 
-        // Tense and Form selector logic
         function setupFilterButtons() {
             const tenseBtns = document.querySelectorAll('.tense-selector-btn');
             const formBtns = document.querySelectorAll('.form-selector-btn');
@@ -705,7 +704,7 @@
             const chat = chatsData.find(c => c.id === 'english-bot');
             if (!chat) return;
             
-            const newTask = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
+            const newTask = getNextTask(activeTenseSetting, activeFormSetting, chat.currentTask);
             chat.currentTask = newTask;
 
             const now = new Date();
@@ -719,14 +718,22 @@
                 inlineButtons: [
                     { text: "💡 Подсказка", action: "hint" },
                     { text: "⏭️ Пропустить", action: "next" },
-                    { text: "📐 Показать правило", action: "rule" }
+                    { text: "🏁 Завершить урок", action: "finish_lesson" }
                 ]
             });
             renderMessages();
         }
 
-        // Inline Actions (Hint, Next, Rule)
         function handleInlineAction(action) {
+            if (action === 'start_lesson') {
+                startLesson();
+                return;
+            }
+            if (action === 'finish_lesson') {
+                finishLesson();
+                return;
+            }
+
             const chat = chatsData.find(c => c.id === 'english-bot');
             if (!chat || !chat.currentTask) return;
             const now = new Date();
@@ -742,16 +749,28 @@
                 });
                 renderMessages();
             } else if (action === 'next') {
-                const nextT = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
+                if (isLessonActive) {
+                    stats.total++;
+                    document.getElementById('stat-progress').textContent = `${stats.total}/${lessonTarget}`;
+                    if (stats.total >= lessonTarget) {
+                        finishLesson();
+                        return;
+                    }
+                }
+                const nextT = getNextTask(activeTenseSetting, activeFormSetting, chat.currentTask);
                 chat.currentTask = nextT;
+                const remaining = isLessonActive ? (lessonTarget - stats.total) : 0;
+                const progressText = isLessonActive ? `\n📊 **Прогресс**: Карточка **${stats.total + 1} из ${lessonTarget}** (Осталось: ${remaining})` : '';
+
                 chat.messages.push({
                     id: Date.now(),
                     sender: 'them',
-                    text: `⏭️ **Задание пропущено!** Новая карточка:\nВремя: **${nextT.tense}** | Форма: **${nextT.form}**\n\nПереведи:\n👉 **"${nextT.russian}"**`,
+                    text: `⏭️ **Задание пропущено!** Новая карточка:${progressText}\nВремя: **${nextT.tense}** | Форма: **${nextT.form}**\n\nПереведи:\n👉 **"${nextT.russian}"**`,
                     time: timeStr,
                     inlineButtons: [
                         { text: "💡 Подсказка", action: "hint" },
-                        { text: "⏭️ Пропустить", action: "next" }
+                        { text: "⏭️ Пропустить", action: "next" },
+                        { text: "🏁 Завершить урок", action: "finish_lesson" }
                     ]
                 });
                 renderMessages();
@@ -765,45 +784,46 @@
                 chat.messages.push({
                     id: Date.now(),
                     sender: 'them',
-                    text: `📚 **Шпоргалка (${chat.currentTask.tense})**:\n${ruleText}`,
+                    text: `📚 **Шпаргалка (${chat.currentTask.tense})**:\n${ruleText}`,
                     time: timeStr
                 });
                 renderMessages();
             }
         }
 
-        // Check vocabulary lookup
         function checkVocabularyQuery(input) {
-            const lower = input.toLowerCase();
-            if (lower.includes('как будет') || lower.includes('как переводится') || lower.includes('что такое')) {
-                for (let [ruKey, enVal] of Object.entries(wordDictionary)) {
-                    if (lower.includes(ruKey)) {
-                        return { found: true, word: ruKey, translation: enVal };
-                    }
-                }
-                return { found: true, word: input, translation: "проверьте написание слова или переведите целое предложение!" };
+            const lower = input.toLowerCase().trim();
+            const triggers = ["как будет", "как переводится", "что такое", "как по английски", "как по-английски", "переведи"];
+
+            const isQuery = triggers.some(t => lower.includes(t));
+            if (!isQuery) return { found: false };
+
+            let targetWord = lower;
+            triggers.forEach(t => { targetWord = targetWord.replace(t, ""); });
+            targetWord = targetWord.replace(/на английский|на английском|по английски|по-английски|слово/g, "").replace(/[.,!??"'«»]/g, "").trim();
+
+            if (!targetWord) return { found: false };
+
+            if (wordDictionary[targetWord]) {
+                return { found: true, word: targetWord, translation: wordDictionary[targetWord] };
             }
-            return { found: false };
+            return { found: true, word: targetWord, translation: null };
         }
 
-        // Translation verification
         function evaluateTranslation(userTranslation, currentTask) {
             const cleanUser = userTranslation.trim().toLowerCase().replace(/[.,!?]/g, '');
             const cleanTarget = currentTask.english.trim().toLowerCase().replace(/[.,!?]/g, '');
+            
             const isCorrect = cleanUser === cleanTarget || cleanUser.includes(cleanTarget);
-
-            const nextTask = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
 
             return {
                 isCorrect: isCorrect,
                 feedback: isCorrect 
                     ? `🎉 **Молодец! Всё правильно!**\nПравильная фраза: **${currentTask.english}**`
-                    : `❌ **Почти получилось!**\nТвой ответ: "${userTranslation}"\nПравильно писать: **${currentTask.english}**`,
-                nextTask: nextTask
+                    : `❌ **Почти получилось! Ошибка в ответе.**\nТвой ответ: "${userTranslation}"\nПравильно писать: **${currentTask.english}**`
             };
         }
 
-        // Message Form Submit Event
         document.getElementById('message-form')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const inputEl = document.getElementById('message-input');
@@ -816,44 +836,47 @@
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-            // 1. Add User Message
-            chat.messages.push({
-                id: Date.now(),
-                sender: 'user',
-                text: text,
-                time: timeStr
-            });
-
+            chat.messages.push({ id: Date.now(), sender: 'user', text: text, time: timeStr });
             inputEl.value = '';
             renderMessages();
 
-            // 2. Check Vocabulary Question
             const vocabCheck = checkVocabularyQuery(text);
             if (vocabCheck.found) {
                 setTimeout(() => {
-                    chat.messages.push({
-                        id: Date.now() + 1,
-                        sender: 'them',
-                        text: `📖 **Словарь**: Слово **"${vocabCheck.word}"** по-английски будет: **"${vocabCheck.translation}"** ✨\n\nА теперь переведи предложение:\n👉 **"${chat.currentTask.russian}"**`,
-                        time: timeStr
-                    });
+                    let responseText = vocabCheck.translation 
+                        ? `📖 **Словарь 4 класса**:\nСлово **"${vocabCheck.word}"** по-английски будет: **"${vocabCheck.translation}"** ✨\n\nПродолжим задание:\n👉 **"${chat.currentTask.russian}"**`
+                        : `📖 **Словарь**: Слово **"${vocabCheck.word}"** пока отсутствует в базе. Переведи предложение:\n👉 **"${chat.currentTask.russian}"**`;
+
+                    chat.messages.push({ id: Date.now() + 1, sender: 'them', text: responseText, time: timeStr });
                     renderMessages();
                 }, 400);
                 return;
             }
 
-            // 3. Evaluate Task Sentence
             const res = evaluateTranslation(text, chat.currentTask);
             stats.total++;
 
             if (res.isCorrect) {
                 stats.correct++;
                 stats.streak++;
+                if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
+
+                // Вносим карточку в список решенных, чтобы она не повторялась
+                const taskIdx = grade4Tasks.indexOf(chat.currentTask);
+                if (taskIdx !== -1) {
+                    completedTaskIndices.add(taskIdx);
+                }
             } else {
                 stats.streak = 0;
             }
 
-            // Log entry for teacher
+            if (!isLessonActive) {
+                isLessonActive = true;
+                startLessonTimer();
+                const btn = document.getElementById('lesson-toggle-btn');
+                if (btn) btn.className = "bg-rose-600 hover:bg-rose-500 text-white font-medium px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-md shadow-rose-600/30 animate-pulse";
+            }
+
             teacherLogs.unshift({
                 time: timeStr,
                 tense: chat.currentTask.tense,
@@ -864,23 +887,49 @@
                 status: res.isCorrect ? 'correct' : 'incorrect'
             });
 
-            // Update Header Stats Badges
             document.getElementById('stat-correct').textContent = stats.correct;
             document.getElementById('stat-streak').textContent = stats.streak + ' стрик';
+            document.getElementById('stat-progress').textContent = `${stats.total}/${lessonTarget}`;
 
-            // Next Task Update
-            chat.currentTask = res.nextTask;
+            if (isLessonActive && stats.total >= lessonTarget) {
+                setTimeout(() => {
+                    chat.messages.push({
+                        id: Date.now() + 2,
+                        sender: 'them',
+                        text: `${res.feedback}\n\n🎉 **ОТЛИЧНО! Вы выполнили все ${lessonTarget} предложений урока!**`,
+                        time: timeStr
+                    });
+                    renderMessages();
+                    renderTeacherLogs();
+                    finishLesson();
+                }, 500);
+                return;
+            }
+
+            // Выбор следующей карточки:
+            // Если ответ верный — выдаем новую карточку из нерешенных
+            // Если ответ неверный — не меняем currentTask (повторяем задание)
+            if (res.isCorrect) {
+                chat.currentTask = getNextTask(activeTenseSetting, activeFormSetting, chat.currentTask);
+            }
+
+            const remainingCount = lessonTarget - stats.total;
+            const progressInfo = `\n📊 **Прогресс**: Карточка **${stats.total + 1} из ${lessonTarget}** (Осталось: ${remainingCount})`;
+
+            const nextPromptHeader = res.isCorrect 
+                ? `📌 **СЛЕДУЮЩЕЕ ЗАДАНИЕ**:${progressInfo}` 
+                : `🔁 **ПОВТОР ЗАДАНИЯ (попробуй ещё раз):**${progressInfo}`;
 
             setTimeout(() => {
                 chat.messages.push({
                     id: Date.now() + 2,
                     sender: 'them',
-                    text: `${res.feedback}\n\n📌 **СЛЕДУЮЩЕЕ ЗАДАНИЕ**:\nВремя: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**\n\nПереведи предложение:\n👉 **"${chat.currentTask.russian}"**`,
+                    text: `${res.feedback}\n\n${nextPromptHeader}\nВремя: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**\n\nПереведи предложение:\n👉 **"${chat.currentTask.russian}"**`,
                     time: timeStr,
                     inlineButtons: [
                         { text: "💡 Подсказка", action: "hint" },
                         { text: "⏭️ Пропустить", action: "next" },
-                        { text: "📐 Показать правило", action: "rule" }
+                        { text: "🏁 Завершить урок", action: "finish_lesson" }
                     ]
                 });
                 renderMessages();
@@ -888,18 +937,14 @@
             }, 500);
         });
 
-        // Initialize UI Elements & Listeners
         window.addEventListener('DOMContentLoaded', () => {
             setupFilterButtons();
             renderChatList();
             renderMessages();
             renderTeacherLogs();
-            startLessonTimer();
 
-            // Mobile Navigation Back Button
             document.getElementById('back-to-list')?.addEventListener('click', showSidebarMobile);
 
-            // Teacher Modal Listeners
             const teacherModal = document.getElementById('teacher-modal');
             const openTeacherBtn = document.getElementById('open-teacher-btn');
             const openTeacherBtnSidebar = document.getElementById('open-teacher-btn-sidebar');
@@ -913,10 +958,11 @@
 
             clearLogsBtn?.addEventListener('click', () => {
                 teacherLogs = [];
-                stats = { correct: 0, streak: 0, total: 0 };
+                stats = { correct: 0, streak: 0, total: 0, maxStreak: 0 };
                 sessionSeconds = 0;
                 document.getElementById('stat-correct').textContent = '0';
                 document.getElementById('stat-streak').textContent = '0 стрик';
+                document.getElementById('stat-progress').textContent = `0/${lessonTarget}`;
                 updateTimerDisplay();
                 renderTeacherLogs();
             });
@@ -938,7 +984,6 @@
                 downloadAnchor.remove();
             });
 
-            // Emoji Picker Drawer Toggle
             const emojiBtn = document.getElementById('emoji-btn');
             const emojiPicker = document.getElementById('emoji-picker');
             emojiBtn?.addEventListener('click', () => emojiPicker?.classList.toggle('hidden'));
@@ -951,7 +996,6 @@
                 });
             });
 
-            // Handle Resize for Responsive Layout
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 768) {
                     document.getElementById('sidebar')?.classList.remove('hidden');
