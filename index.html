@@ -98,7 +98,7 @@
     <div id="app" class="w-full h-full max-w-[1600px] flex overflow-hidden shadow-2xl relative bg-slate-900 border border-slate-800">
         
         <!-- SIDEBAR (CHATS LIST) -->
-        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex-col h-full z-20 transition-all duration-300 hidden md:flex shrink-0">
+        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full z-20 transition-all duration-300 shrink-0">
             <!-- Sidebar Header -->
             <div class="p-3 bg-slate-900 flex items-center justify-between border-b border-slate-800 gap-2">
                 <button id="menu-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
@@ -115,7 +115,7 @@
             <div class="flex border-b border-slate-800 text-xs font-semibold px-2 text-slate-400 overflow-x-auto no-scrollbar">
                 <button class="folder-tab active px-4 py-2.5 border-b-2 border-blue-500 text-blue-400 flex items-center gap-1.5 shrink-0" data-folder="all">
                     <span>Все</span>
-                    <span class="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full" id="total-unread-badge">3</span>
+                    <span class="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full" id="total-unread-badge">0</span>
                 </button>
                 <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="personal">
                     <span>Студенты</span>
@@ -125,9 +125,9 @@
                 </button>
             </div>
 
-            <!-- Chat List -->
+            <!-- Chat List Container -->
             <div id="chat-list" class="flex-1 overflow-y-auto divide-y divide-slate-800/40">
-                <!-- Chat items loaded dynamically -->
+                <!-- Dynamic Chat List Items -->
             </div>
 
             <!-- Sidebar Footer Status -->
@@ -136,16 +136,16 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Telegram Web v2.4</span>
                 </span>
-                <button id="theme-toggle" class="hover:text-slate-300">
-                    <i class="fa-solid fa-moon"></i>
+                <button id="open-teacher-btn-sidebar" class="hover:text-purple-400 flex items-center gap-1 text-slate-400">
+                    <i class="fa-solid fa-graduation-cap"></i> Учителю
                 </button>
             </div>
         </aside>
 
         <!-- MAIN CHAT AREA -->
-        <main id="chat-window" class="flex-1 flex flex-col h-full w-full relative bg-slate-950 min-w-0">
+        <main id="chat-window" class="flex-1 hidden md:flex flex-col h-full w-full relative bg-slate-950 min-w-0">
             <!-- Chat Top Header -->
-            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-3 md:px-4 flex items-center justify-between z-10 gap-2">
+            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-3 md:px-4 flex items-center justify-between z-10 gap-2 shrink-0">
                 <div class="flex items-center gap-2 md:gap-3 cursor-pointer min-w-0" id="header-user-info">
                     <button id="back-to-list" class="md:hidden w-8 h-8 rounded-full hover:bg-slate-800 text-slate-400 flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-arrow-left"></i>
@@ -156,14 +156,14 @@
                         </div>
                         <span id="header-online-indicator" class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
                     </div>
-                    <div>
-                        <h2 id="header-name" class="font-semibold text-slate-100 text-sm md:text-base leading-tight">English Grammar Bot 🇬🇧</h2>
-                        <p id="header-status" class="text-xs text-blue-400">онлайн • Репетитор AI</p>
+                    <div class="truncate">
+                        <h2 id="header-name" class="font-semibold text-slate-100 text-sm md:text-base leading-tight truncate">English Grammar Bot 🇬🇧</h2>
+                        <p id="header-status" class="text-xs text-blue-400 truncate">онлайн • Репетитор AI (4 класс)</p>
                     </div>
                 </div>
 
                 <!-- Learning Stats Bar & Teacher Button -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 md:gap-3">
                     <div class="hidden sm:flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50 text-xs">
                         <div class="flex items-center gap-1.5 text-emerald-400 font-medium">
                             <i class="fa-solid fa-circle-check"></i>
@@ -175,6 +175,11 @@
                             <span id="stat-streak">0 стрик</span>
                         </div>
                         <div class="h-3 w-px bg-slate-700"></div>
+                        <div class="flex items-center gap-1.5 text-indigo-400 font-medium" title="Время на уроке">
+                            <i class="fa-regular fa-clock"></i>
+                            <span id="stat-timer">00:00</span>
+                        </div>
+                        <div class="h-3 w-px bg-slate-700"></div>
                         <div class="flex items-center gap-1 text-slate-400">
                             <span id="active-tense-badge" class="bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded-md font-semibold text-[11px]">
                                 Все времена
@@ -182,22 +187,15 @@
                         </div>
                     </div>
 
-                    <!-- Open Teacher Dashboard Button -->
-                    <button id="open-teacher-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-3 py-1.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition">
-                        <i class="fa-solid fa-user-graduate"></i>
-                        <span class="hidden md:inline">Панель учителя</span>
+                    <button id="open-teacher-btn" class="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span class="hidden sm:inline">Панель Учителя</span>
                     </button>
-
-                    <div class="flex items-center gap-1 text-slate-400">
-                        <button id="reset-stats-btn" class="w-9 h-9 rounded-full hover:bg-slate-800 hover:text-amber-400 flex items-center justify-center transition" title="Сбросить счет">
-                            <i class="fa-solid fa-rotate-right"></i>
-                        </button>
-                    </div>
                 </div>
             </header>
 
             <!-- Tense Toolbar Panel -->
-            <div id="grammar-bar" class="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex flex-wrap gap-2 items-center text-xs overflow-x-auto">
+            <div id="grammar-bar" class="bg-slate-900/90 border-b border-slate-800 px-3 py-2 flex flex-wrap gap-1.5 items-center text-xs overflow-x-auto shrink-0">
                 <span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider shrink-0 mr-1">Время:</span>
                 <button class="tense-selector-btn active bg-blue-600 text-white px-2.5 py-1 rounded-lg transition" data-tense="ALL">
                     🔀 Все Времена
@@ -248,7 +246,7 @@
             </div>
 
             <!-- Input Area Footer -->
-            <footer class="p-3 bg-slate-900 border-t border-slate-800 relative z-10">
+            <footer class="p-3 bg-slate-900 border-t border-slate-800 relative z-10 shrink-0">
                 <form id="message-form" class="flex items-center gap-2 max-w-4xl mx-auto">
                     <button type="button" id="attach-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 flex items-center justify-center transition">
                         <i class="fa-solid fa-paperclip text-lg"></i>
@@ -259,7 +257,7 @@
                         <button type="button" id="emoji-btn" class="text-slate-400 hover:text-amber-400 mr-2 transition">
                             <i class="fa-regular fa-face-smile text-xl"></i>
                         </button>
-                        <input type="text" id="message-input" placeholder="Написать перевод..." 
+                        <input type="text" id="message-input" placeholder="Написать перевод или спросить слово..." 
                                autocomplete="off"
                                class="w-full bg-transparent text-slate-100 py-3 text-sm focus:outline-none placeholder-slate-500">
                     </div>
@@ -282,7 +280,7 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-slate-100 text-base">Панель Учителя / Мониторинг</h3>
-                            <p class="text-xs text-slate-400">Отслеживание ответов и прогресса студентов в реальном времени</p>
+                            <p class="text-xs text-slate-400">Отслеживание ответов и прогресса ученика в реальном времени</p>
                         </div>
                     </div>
                     <button id="close-teacher-modal" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
@@ -291,12 +289,12 @@
                 </div>
 
                 <!-- Teacher Controls & Stats Bar -->
-                <div class="p-4 bg-slate-950/50 border-b border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                <div class="p-4 bg-slate-950/50 border-b border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
                     <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
                         <div class="text-2xl text-emerald-400"><i class="fa-solid fa-bullseye"></i></div>
                         <div>
-                            <span class="text-slate-400 block">Точность группы</span>
-                            <span class="font-bold text-slate-100 text-base" id="teacher-accuracy-val">85%</span>
+                            <span class="text-slate-400 block">Точность ученика</span>
+                            <span class="font-bold text-slate-100 text-base" id="teacher-accuracy-val">100%</span>
                         </div>
                     </div>
 
@@ -304,46 +302,52 @@
                         <div class="text-2xl text-blue-400"><i class="fa-solid fa-tasks"></i></div>
                         <div>
                             <span class="text-slate-400 block">Всего выполнено</span>
-                            <span class="font-bold text-slate-100 text-base" id="teacher-total-answers">14 карточек</span>
+                            <span class="font-bold text-slate-100 text-base" id="teacher-total-answers">0 карточек</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-amber-400"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="text-2xl text-amber-400"><i class="fa-solid fa-fire"></i></div>
                         <div>
-                            <span class="text-slate-400 block">Сложная тема</span>
-                            <span class="font-bold text-amber-300 text-xs">Past Simple (-)</span>
+                            <span class="text-slate-400 block">Текущий Стрик</span>
+                            <span class="font-bold text-amber-300 text-base" id="teacher-streak-val">0</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
-                        <div class="text-2xl text-purple-400"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="text-2xl text-purple-400"><i class="fa-solid fa-stopwatch"></i></div>
                         <div>
-                            <span class="text-slate-400 block">Активный студент</span>
-                            <span class="font-bold text-slate-100 text-xs">Иван (Текущая сессия)</span>
+                            <span class="text-slate-400 block">Время на уроке</span>
+                            <span class="font-bold text-purple-300 text-base" id="teacher-lesson-time">00:00:00</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex items-center gap-3">
+                        <div class="text-2xl text-indigo-400"><i class="fa-solid fa-user-check"></i></div>
+                        <div>
+                            <span class="text-slate-400 block">Ученик</span>
+                            <span class="font-bold text-slate-100 text-xs" id="teacher-student-name">Дархан (4 класс)</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Teacher Main Content Area -->
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <!-- Filters & Export -->
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
                         <h4 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-purple-400"></i>
-                            Журнал последних ответов студента
+                            Журнал ответов текущей сессии
                         </h4>
                         <div class="flex items-center gap-2">
                             <button id="clear-teacher-logs" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-trash-can"></i> Очистить лог
                             </button>
                             <button id="export-report-btn" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-file-export"></i> Экспорт отчета
+                                <i class="fa-solid fa-file-export"></i> Экспорт
                             </button>
                         </div>
                     </div>
 
-                    <!-- Answers History Table / Cards -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs text-slate-300">
                             <thead class="bg-slate-800/90 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-700">
@@ -351,7 +355,7 @@
                                     <th class="p-3">Время</th>
                                     <th class="p-3">Тема / Форма</th>
                                     <th class="p-3">Задание (RU)</th>
-                                    <th class="p-3">Ответ студента (EN)</th>
+                                    <th class="p-3">Ответ ученика (EN)</th>
                                     <th class="p-3">Эталон перевода</th>
                                     <th class="p-3 text-center">Результат</th>
                                 </tr>
@@ -368,32 +372,100 @@
     </div>
 
     <script>
-        // Global Teacher History Log Data
-        let teacherLogs = [
-            {
-                time: "10:40",
-                tense: "Present Simple",
-                form: "Affirmative (+)",
-                russian: "Я читаю книгу каждый вечер.",
-                userAnswer: "I read an interesting book every evening.",
-                correctAnswer: "I read an interesting book every evening.",
-                status: "correct"
-            },
-            {
-                time: "10:35",
-                tense: "Past Simple",
-                form: "Negative (-)",
-                russian: "Она не ходила в школу вчера.",
-                userAnswer: "She didn't went to school yesterday.",
-                correctAnswer: "She didn't go to school yesterday.",
-                status: "incorrect"
+        // Global Telegram WebApp Setup
+        if (window.Telegram && window.Telegram.WebApp) {
+            try {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            } catch (e) {
+                console.log("Telegram WebApp initialization error:", e);
             }
-        ];
+        }
 
-        let stats = { correct: 1, streak: 1, total: 2 };
-
+        // Global State
+        const studentName = "Дархан";
+        let activeChatId = 'english-bot';
+        let teacherLogs = [];
+        let stats = { correct: 0, streak: 0, total: 0 };
         let activeTenseSetting = "ALL";
         let activeFormSetting = "ALL";
+        let sessionSeconds = 0;
+        let timerInterval = null;
+
+        // 4th Grade Tasks Data Bank
+        const grade4Tasks = [
+            // Present Simple
+            { russian: "Я люблю кошек.", english: "I like cats.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Она живет в большим доме.", english: "She lives in a big house.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Мы играем в футбол каждый день.", english: "We play football every day.", tense: "Present Simple", form: "Affirmative (+)" },
+            { russian: "Он не ест яблоки.", english: "He does not eat apples.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Я не смотрю ТВ утром.", english: "I do not watch TV in the morning.", tense: "Present Simple", form: "Negative (-)" },
+            { russian: "Ты любишь собак?", english: "Do you like dogs?", tense: "Present Simple", form: "Interrogative (?)" },
+            
+            // Present Continuous
+            { russian: "Она сейчас читает книгу.", english: "She is reading a book now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Они сейчас бегают в парке.", english: "They are running in the park now.", tense: "Present Continuous", form: "Affirmative (+)" },
+            { russian: "Я не сплю сейчас.", english: "I am not sleeping now.", tense: "Present Continuous", form: "Negative (-)" },
+            { russian: "Ты сейчас рисуешь?", english: "Are you drawing now?", tense: "Present Continuous", form: "Interrogative (?)" },
+
+            // Past Simple
+            { russian: "Вчера я ходил в школу.", english: "I went to school yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Мы смотрели мультик вчера.", english: "We watched a cartoon yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+            { russian: "Она не играла в теннис вчера.", english: "She did not play tennis yesterday.", tense: "Past Simple", form: "Negative (-)" },
+            { russian: "Ты видел моего кота вчера?", english: "Did you see my cat yesterday?", tense: "Past Simple", form: "Interrogative (?)" },
+
+            // Future Simple
+            { russian: "Завтра я буду играть в игру.", english: "I will play a game tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Они поедут в зоопарк завтра.", english: "They will go to the zoo tomorrow.", tense: "Future Simple", form: "Affirmative (+)" },
+            { russian: "Он не пойдет гулять завтра.", english: "He will not go for a walk tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+            { russian: "Ты будешь пить сок завтра?", english: "Will you drink juice tomorrow?", tense: "Future Simple", form: "Interrogative (?)" }
+        ];
+
+        // Random Task Selector Helper
+        function getRandom4thGradeTask(tense = 'ALL', form = 'ALL') {
+            let filtered = grade4Tasks;
+            if (tense !== 'ALL') {
+                filtered = filtered.filter(t => t.tense === tense);
+            }
+            if (form !== 'ALL') {
+                const formMap = {
+                    'Affirmative': 'Affirmative (+)',
+                    'Negative': 'Negative (-)',
+                    'Interrogative': 'Interrogative (?)'
+                };
+                const targetForm = formMap[form] || form;
+                filtered = filtered.filter(t => t.form === targetForm);
+            }
+            if (filtered.length === 0) filtered = grade4Tasks;
+            return filtered[Math.floor(Math.random() * filtered.length)];
+        }
+
+        // Dictionary vocabulary for 4th grade vocabulary lookup
+        const wordDictionary = {
+            "интересный": "interesting",
+            "интересная": "interesting",
+            "книга": "book",
+            "кошка": "cat",
+            "кот": "cat",
+            "собака": "dog",
+            "школа": "school",
+            "дом": "house",
+            "большой": "big",
+            "маленький": "small",
+            "яблоко": "apple",
+            "сок": "juice",
+            "друг": "friend",
+            "игра": "game",
+            "зоопарк": "zoo",
+            "футбол": "football",
+            "завтра": "tomorrow",
+            "вчера": "yesterday",
+            "сейчас": "now",
+            "рисовать": "draw",
+            "смотреть": "watch",
+            "читать": "read",
+            "ходить": "go"
+        };
 
         const chatsData = [
             {
@@ -401,13 +473,12 @@
                 name: 'English Grammar Bot 🇬🇧',
                 avatar: 'EN',
                 bgGradient: 'from-blue-600 to-indigo-500',
-                status: 'онлайн • Репетитор AI',
+                status: `онлайн • Ученик: ${studentName}`,
                 category: 'bots',
                 unread: 0,
-                typing: false,
                 currentTask: {
-                    russian: "Они смотрят новый фильм сейчас.",
-                    english: "They are watching a new movie now.",
+                    russian: "Она сейчас читает книгу.",
+                    english: "She is reading a book now.",
                     tense: "Present Continuous",
                     form: "Affirmative (+)"
                 },
@@ -415,13 +486,7 @@
                     { 
                         id: 1, 
                         sender: 'them', 
-                        text: `👋 **Привет! Добро пожаловать на тренажер времен!**
-
-📌 **ТЕКУЩЕЕ ЗАДАНИЕ**:
-Время: **Present Continuous** | Форма: **Утвердительная (+)**
-
-Переведи предложение:
-👉 **"Они смотрят новый фильм сейчас."**`, 
+                        text: `👋 **Привет, ${studentName}! Я твой репетитор по английскому языку (4 класс)!**\n\n📌 **ТЕКУЩЕЕ ЗАДАНИЕ**:\nВремя: **Present Continuous** | Форма: **Утвердительная (+)**\n\nПереведи предложение:\n👉 **"Она сейчас читает книгу."**`, 
                         time: '10:45',
                         inlineButtons: [
                             { text: "💡 Подсказка", action: "hint" },
@@ -433,177 +498,234 @@
             }
         ];
 
-        let activeChatId = 'english-bot';
-        let currentFolder = 'all';
-
-        // DOM elements
-        const sidebarEl = document.getElementById('sidebar');
-        const chatWindowEl = document.getElementById('chat-window');
-        const backToListBtn = document.getElementById('back-to-list');
-        const chatListEl = document.getElementById('chat-list');
-        const messagesContainer = document.getElementById('messages-container');
-        const messageForm = document.getElementById('message-form');
-        const messageInput = document.getElementById('message-input');
-        const headerName = document.getElementById('header-name');
-        const headerStatus = document.getElementById('header-status');
-        const teacherModal = document.getElementById('teacher-modal');
-        const openTeacherBtn = document.getElementById('open-teacher-btn');
-        const closeTeacherModal = document.getElementById('close-teacher-modal');
-        const teacherLogTable = document.getElementById('teacher-log-table');
-
-        // Mobile View Controllers
-        function showSidebarMobile() {
-            if (window.innerWidth < 768) {
-                sidebarEl.classList.remove('hidden');
-                sidebarEl.classList.add('flex');
-                chatWindowEl.classList.add('hidden');
-                chatWindowEl.classList.remove('flex');
-            }
+        function startLessonTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                sessionSeconds++;
+                updateTimerDisplay();
+            }, 1000);
         }
 
+        function updateTimerDisplay() {
+            const hrs = Math.floor(sessionSeconds / 3600);
+            const mins = Math.floor((sessionSeconds % 3600) / 60);
+            const secs = sessionSeconds % 60;
+
+            const formattedMinsSecs = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+            const formattedFull = String(hrs).padStart(2, '0') + ':' + formattedMinsSecs;
+
+            const statTimer = document.getElementById('stat-timer');
+            const teacherTime = document.getElementById('teacher-lesson-time');
+
+            if (statTimer) statTimer.textContent = formattedMinsSecs;
+            if (teacherTime) teacherTime.textContent = formattedFull;
+        }
+
+        // Show/Hide Mobile View Handlers
         function showChatMobile() {
+            const sidebar = document.getElementById('sidebar');
+            const chatWindow = document.getElementById('chat-window');
             if (window.innerWidth < 768) {
-                sidebarEl.classList.add('hidden');
-                sidebarEl.classList.remove('flex');
-                chatWindowEl.classList.remove('hidden');
-                chatWindowEl.classList.add('flex');
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
+                chatWindow.classList.remove('hidden');
+                chatWindow.classList.add('flex');
             }
         }
 
-        if (backToListBtn) {
-            backToListBtn.addEventListener('click', showSidebarMobile);
-        }
-
-        // Initialize Telegram Mini App SDK if available
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
-
-        // Gemini Evaluation API Call
-        async function evaluateTranslationWithGemini(userTranslation, currentTask) {
-            const systemPrompt = `Ты — профессиональный репетитор английского языка.
-Проверяй перевод студента с русского на английский.
-Текущее задание:
-- На русском: "${currentTask.russian}"
-- Целевое время: ${currentTask.tense}
-- Форма: ${currentTask.form}
-- Правильный перевод: "${currentTask.english}"
-
-Верни ответ СТРОГО в формате JSON:
-{
-  "isWordQuestion": false,
-  "isCorrect": true или false,
-  "feedback": "Похвала или пояснение ошибки в Telegram Markdown на русском",
-  "nextTask": {
-     "russian": "Новое предложение",
-     "english": "Новый правильный перевод",
-     "tense": "Present Simple | Present Continuous | Past Simple | Future Simple",
-     "form": "Affirmative (+) | Negative (-) | Interrogative (?)"
-  }
-}`;
-
-            const userQuery = `Ответ ученика: "${userTranslation}"`;
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: userQuery }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) return JSON.parse(text);
-                }
-            } catch (e) {
-                console.warn("Fallback offline mode used");
+        function showSidebarMobile() {
+            const sidebar = document.getElementById('sidebar');
+            const chatWindow = document.getElementById('chat-window');
+            if (window.innerWidth < 768) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                chatWindow.classList.add('hidden');
+                chatWindow.classList.remove('flex');
             }
-
-            return fallbackCheck(userTranslation, currentTask);
         }
 
-        function fallbackCheck(userTranslation, currentTask) {
-            const cleanUser = userTranslation.trim().toLowerCase().replace(/[.,!?]/g, '');
-            const cleanTarget = currentTask.english.trim().toLowerCase().replace(/[.,!?]/g, '');
-            const isCorrect = cleanUser === cleanTarget || cleanUser.includes(cleanTarget);
+        // Render Chat List Item
+        function renderChatList() {
+            const chatListEl = document.getElementById('chat-list');
+            if (!chatListEl) return;
 
-            const sampleTasks = [
-                { russian: "Она обычно пьет кофе утром.", english: "She usually drinks coffee in the morning.", tense: "Present Simple", form: "Affirmative (+)" },
-                { russian: "Мы не пошли в кино вчера.", english: "We did not go to the cinema yesterday.", tense: "Past Simple", form: "Negative (-)" },
-                { russian: "Ты будешь читать эту книгу?", english: "Will you read this book?", tense: "Future Simple", form: "Interrogative (?)" }
-            ];
-            const nextTask = sampleTasks[Math.floor(Math.random() * sampleTasks.length)];
-
-            return {
-                isWordQuestion: false,
-                isCorrect: isCorrect,
-                feedback: isCorrect 
-                    ? `🎉 **Отлично! Задание выполнено верность!**\nПравильная форма: **${currentTask.english}**`
-                    : `❌ **Есть ошибка!**\nТвой ответ: "${userTranslation}"\nПравильно: **${currentTask.english}**`,
-                nextTask: nextTask
-            };
+            chatListEl.innerHTML = chatsData.map(chat => `
+                <div onclick="selectChat('${chat.id}')" class="p-3 flex items-center gap-3 cursor-pointer hover:bg-slate-800/60 transition ${chat.id === activeChatId ? 'bg-slate-800/80 border-l-4 border-blue-500' : ''}">
+                    <div class="relative shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr ${chat.bgGradient} flex items-center justify-center text-white font-bold shadow text-lg">
+                            ${chat.avatar}
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h3 class="font-semibold text-slate-100 text-sm truncate">${chat.name}</h3>
+                            <span class="text-[11px] text-slate-400">10:45</span>
+                        </div>
+                        <p class="text-xs text-slate-400 truncate">${chat.status}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
+        function selectChat(chatId) {
+            activeChatId = chatId;
+            renderChatList();
+            renderMessages();
+            showChatMobile();
+        }
+
+        // Formats Markdown bold / inline syntax for Telegram-like UI
         function formatMarkdown(text) {
             if (!text) return '';
             return text
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-blue-300 px-1 py-0.5 rounded text-xs">$1</code>')
                 .replace(/\n/g, '<br>');
         }
 
+        // Render Chat Messages
         function renderMessages() {
-            const chat = chatsData.find(c => c.id === activeChatId);
-            if (!chat) return;
+            const messagesContainer = document.getElementById('messages-container');
+            const activeChat = chatsData.find(c => c.id === activeChatId);
+            if (!messagesContainer || !activeChat) return;
 
-            messagesContainer.innerHTML = `
-                <div class="flex justify-center my-3 sticky top-2 z-10">
-                    <span class="bg-slate-900/80 backdrop-blur text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-800/50">Сегодня</span>
-                </div>
-            `;
-
-            chat.messages.forEach(msg => {
-                const isMe = msg.sender === 'me';
-                const msgWrapper = document.createElement('div');
-                msgWrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3`;
-                msgWrapper.innerHTML = `
-                    <div class="relative max-w-[85%] md:max-w-lg px-4 py-2.5 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-br-none bubble-out' : 'bg-slate-800 text-slate-100 rounded-bl-none bubble-in'} shadow-md text-sm">
-                        <div>${formatMarkdown(msg.text)}</div>
-                        <div class="flex justify-end items-center gap-1 text-[10px] opacity-75 mt-1">
-                            <span>${msg.time}</span>
-                            ${isMe ? '<i class="fa-solid fa-check-double text-blue-200"></i>' : ''}
+            messagesContainer.innerHTML = activeChat.messages.map(msg => {
+                const isUser = msg.sender === 'user';
+                return `
+                    <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'} my-2">
+                        <div class="relative max-w-[85%] sm:max-w-[75%] px-4 py-2.5 rounded-2xl text-sm shadow-md ${
+                            isUser 
+                                ? 'bg-blue-600 text-white bubble-out rounded-br-none' 
+                                : 'bg-slate-800 text-slate-100 border border-slate-700/60 bubble-in rounded-bl-none'
+                        }">
+                            <div class="leading-relaxed">${formatMarkdown(msg.text)}</div>
+                            <div class="text-[10px] text-right mt-1 opacity-70 flex items-center justify-end gap-1">
+                                <span>${msg.time}</span>
+                                ${isUser ? '<i class="fa-solid fa-check-double text-[10px]"></i>' : ''}
+                            </div>
                         </div>
+                        ${msg.inlineButtons ? `
+                            <div class="flex flex-wrap gap-2 mt-2 max-w-[85%] sm:max-w-[75%]">
+                                ${msg.inlineButtons.map(btn => `
+                                    <button onclick="handleInlineAction('${btn.action}')" class="tg-inline-btn px-3 py-1.5 rounded-xl text-xs font-medium text-blue-300 flex items-center gap-1.5 shadow">
+                                        ${btn.text}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                 `;
+            }).join('');
 
-                if (!isMe && msg.inlineButtons) {
-                    const btnContainer = document.createElement('div');
-                    btnContainer.className = "flex flex-wrap gap-1.5 mt-2";
-                    msg.inlineButtons.forEach(btn => {
-                        const buttonEl = document.createElement('button');
-                        buttonEl.className = "tg-inline-btn text-xs text-blue-300 px-3 py-1.5 rounded-xl flex items-center gap-1";
-                        buttonEl.innerHTML = btn.text;
-                        buttonEl.onclick = () => handleInlineAction(btn.action);
-                        btnContainer.appendChild(buttonEl);
-                    });
-                    msgWrapper.appendChild(btnContainer);
-                }
-
-                messagesContainer.appendChild(msgWrapper);
-            });
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
+        // Render Teacher Dashboard Logs
+        function renderTeacherLogs() {
+            const tableBody = document.getElementById('teacher-log-table');
+            const accuracyVal = document.getElementById('teacher-accuracy-val');
+            const totalAnswers = document.getElementById('teacher-total-answers');
+            const streakVal = document.getElementById('teacher-streak-val');
+
+            if (accuracyVal) {
+                const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 100;
+                accuracyVal.textContent = acc + '%';
+            }
+            if (totalAnswers) totalAnswers.textContent = stats.total + ' карточек';
+            if (streakVal) streakVal.textContent = stats.streak;
+
+            if (!tableBody) return;
+
+            if (teacherLogs.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-4 text-center text-slate-500 italic">Ответов пока нет. Начните выполнять задания в чате!</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = teacherLogs.map(log => `
+                <tr class="hover:bg-slate-800/50 transition border-b border-slate-800/40">
+                    <td class="p-3 text-slate-400 font-mono text-[11px]">${log.time}</td>
+                    <td class="p-3"><span class="bg-slate-800 px-2 py-0.5 rounded text-blue-400">${log.tense} (${log.form})</span></td>
+                    <td class="p-3 font-medium text-slate-200">${log.russian}</td>
+                    <td class="p-3 text-slate-300 font-mono">${log.userAnswer}</td>
+                    <td class="p-3 text-emerald-400/90 font-mono">${log.correctAnswer}</td>
+                    <td class="p-3 text-center">
+                        ${log.status === 'correct' 
+                            ? '<span class="bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full text-[10px] font-bold">✓ Верно</span>'
+                            : '<span class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold">✗ Ошибка</span>'
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Tense and Form selector logic
+        function setupFilterButtons() {
+            const tenseBtns = document.querySelectorAll('.tense-selector-btn');
+            const formBtns = document.querySelectorAll('.form-selector-btn');
+            const badge = document.getElementById('active-tense-badge');
+
+            tenseBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tenseBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-blue-600', 'text-white');
+                        b.classList.add('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                    });
+                    btn.classList.add('active', 'bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                    
+                    activeTenseSetting = btn.getAttribute('data-tense');
+                    if (badge) {
+                        badge.textContent = activeTenseSetting === 'ALL' ? 'Все времена' : activeTenseSetting;
+                    }
+                    switchTaskToFilter();
+                });
+            });
+
+            formBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    formBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        b.classList.add('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                    });
+                    btn.classList.add('active', 'bg-indigo-600', 'text-white');
+                    btn.classList.remove('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                    
+                    activeFormSetting = btn.getAttribute('data-form');
+                    switchTaskToFilter();
+                });
+            });
+        }
+
+        function switchTaskToFilter() {
+            const chat = chatsData.find(c => c.id === 'english-bot');
+            if (!chat) return;
+            
+            const newTask = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
+            chat.currentTask = newTask;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            chat.messages.push({
+                id: Date.now(),
+                sender: 'them',
+                text: `🎯 **Выбрана новая тема (4 класс)!**\nВремя: **${newTask.tense}** | Форма: **${newTask.form}**\n\nПереведи предложение:\n👉 **"${newTask.russian}"**`,
+                time: timeStr,
+                inlineButtons: [
+                    { text: "💡 Подсказка", action: "hint" },
+                    { text: "⏭️ Пропустить", action: "next" },
+                    { text: "📐 Показать правило", action: "rule" }
+                ]
+            });
+            renderMessages();
+        }
+
+        // Inline Actions (Hint, Next, Rule)
         function handleInlineAction(action) {
             const chat = chatsData.find(c => c.id === 'english-bot');
             if (!chat || !chat.currentTask) return;
@@ -620,75 +742,12 @@
                 });
                 renderMessages();
             } else if (action === 'next') {
+                const nextT = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
+                chat.currentTask = nextT;
                 chat.messages.push({
                     id: Date.now(),
                     sender: 'them',
-                    text: `⏭️ **Задание пропущено.** Загружаю следующее...`,
-                    time: timeStr
-                });
-                renderMessages();
-            } else if (action === 'rule') {
-                chat.messages.push({
-                    id: Date.now(),
-                    sender: 'them',
-                    text: `📚 **Правило ${chat.currentTask.tense}**: Обращайте внимание на порядок слов и вспомогательные глаголы.`,
-                    time: timeStr
-                });
-                renderMessages();
-            }
-        }
-
-        // Submit Answer Handler
-        messageForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if (!text) return;
-
-            const chat = chatsData.find(c => c.id === activeChatId);
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-
-            chat.messages.push({ id: Date.now(), sender: 'me', text: text, time: timeStr });
-            messageInput.value = '';
-            renderMessages();
-
-            // AI Tutoring & Logging to Teacher View
-            if (chat.id === 'english-bot') {
-                headerStatus.textContent = 'проверяет...';
-
-                const result = await evaluateTranslationWithGemini(text, chat.currentTask);
-
-                // Add entry to Teacher Log
-                teacherLogs.unshift({
-                    time: timeStr,
-                    tense: chat.currentTask.tense,
-                    form: chat.currentTask.form,
-                    russian: chat.currentTask.russian,
-                    userAnswer: text,
-                    correctAnswer: chat.currentTask.english,
-                    status: result.isCorrect ? 'correct' : 'incorrect'
-                });
-
-                // Update Stats
-                stats.total++;
-                if (result.isCorrect) {
-                    stats.correct++;
-                    stats.streak++;
-                } else {
-                    stats.streak = 0;
-                }
-                updateStatsUI();
-                renderTeacherLogs();
-
-                if (result.nextTask) {
-                    chat.currentTask = result.nextTask;
-                }
-
-                headerStatus.textContent = chat.status;
-                chat.messages.push({
-                    id: Date.now(),
-                    sender: 'them',
-                    text: `${result.feedback}\n\n---\n📌 **СЛЕДУЮЩЕЕ ЗАДАНИЕ**:\nВремя: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**\n\nПереведи:\n👉 **"${chat.currentTask.russian}"**`,
+                    text: `⏭️ **Задание пропущено!** Новая карточка:\nВремя: **${nextT.tense}** | Форма: **${nextT.form}**\n\nПереведи:\n👉 **"${nextT.russian}"**`,
                     time: timeStr,
                     inlineButtons: [
                         { text: "💡 Подсказка", action: "hint" },
@@ -696,90 +755,211 @@
                     ]
                 });
                 renderMessages();
-            }
-        });
+            } else if (action === 'rule') {
+                let ruleText = "Запомни порядок слов!";
+                if (chat.currentTask.tense === "Present Simple") ruleText = "Present Simple: I/you/we/they + verb, He/She/It + verb(-s). Для вопросов и отрицаний используем do/does.";
+                if (chat.currentTask.tense === "Present Continuous") ruleText = "Present Continuous: am/is/are + глагол с -ing (действие происходит прямо сейчас).";
+                if (chat.currentTask.tense === "Past Simple") ruleText = "Past Simple: глагол во 2-й форме или с -ed. Для вопросов и отрицаний — did.";
+                if (chat.currentTask.tense === "Future Simple") ruleText = "Future Simple: will + глагол (действие произойдет в будущем).";
 
-        function updateStatsUI() {
-            document.getElementById('stat-correct').textContent = stats.correct;
-            document.getElementById('stat-streak').textContent = `${stats.streak} стрик 🔥`;
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: `📚 **Шпоргалка (${chat.currentTask.tense})**:\n${ruleText}`,
+                    time: timeStr
+                });
+                renderMessages();
+            }
         }
 
-        // Render Teacher Logs Modal
-        function renderTeacherLogs() {
-            teacherLogTable.innerHTML = '';
+        // Check vocabulary lookup
+        function checkVocabularyQuery(input) {
+            const lower = input.toLowerCase();
+            if (lower.includes('как будет') || lower.includes('как переводится') || lower.includes('что такое')) {
+                for (let [ruKey, enVal] of Object.entries(wordDictionary)) {
+                    if (lower.includes(ruKey)) {
+                        return { found: true, word: ruKey, translation: enVal };
+                    }
+                }
+                return { found: true, word: input, translation: "проверьте написание слова или переведите целое предложение!" };
+            }
+            return { found: false };
+        }
 
-            const totalAnswers = teacherLogs.length;
-            const correctCount = teacherLogs.filter(l => l.status === 'correct').length;
-            const accuracyPercent = totalAnswers > 0 ? Math.round((correctCount / totalAnswers) * 100) : 0;
+        // Translation verification
+        function evaluateTranslation(userTranslation, currentTask) {
+            const cleanUser = userTranslation.trim().toLowerCase().replace(/[.,!?]/g, '');
+            const cleanTarget = currentTask.english.trim().toLowerCase().replace(/[.,!?]/g, '');
+            const isCorrect = cleanUser === cleanTarget || cleanUser.includes(cleanTarget);
 
-            document.getElementById('teacher-accuracy-val').textContent = `${accuracyPercent}%`;
-            document.getElementById('teacher-total-answers').textContent = `${totalAnswers} ответов`;
+            const nextTask = getRandom4thGradeTask(activeTenseSetting, activeFormSetting);
 
-            teacherLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition";
-                tr.innerHTML = `
-                    <td class="p-3 text-slate-400">${log.time}</td>
-                    <td class="p-3">
-                        <span class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[11px] font-medium block w-max mb-0.5">${log.tense}</span>
-                        <span class="text-slate-500 text-[10px]">${log.form}</span>
-                    </td>
-                    <td class="p-3 font-medium text-slate-200">${log.russian}</td>
-                    <td class="p-3 font-mono ${log.status === 'correct' ? 'text-emerald-400' : 'text-rose-400'}">${log.userAnswer}</td>
-                    <td class="p-3 text-slate-400 font-mono">${log.correctAnswer}</td>
-                    <td class="p-3 text-center">
-                        ${log.status === 'correct' 
-                            ? '<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Верно</span>'
-                            : '<span class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> Ошибка</span>'}
-                    </td>
-                `;
-                teacherLogTable.appendChild(tr);
+            return {
+                isCorrect: isCorrect,
+                feedback: isCorrect 
+                    ? `🎉 **Молодец! Всё правильно!**\nПравильная фраза: **${currentTask.english}**`
+                    : `❌ **Почти получилось!**\nТвой ответ: "${userTranslation}"\nПравильно писать: **${currentTask.english}**`,
+                nextTask: nextTask
+            };
+        }
+
+        // Message Form Submit Event
+        document.getElementById('message-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('message-input');
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            const chat = chatsData.find(c => c.id === 'english-bot');
+            if (!chat) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            // 1. Add User Message
+            chat.messages.push({
+                id: Date.now(),
+                sender: 'user',
+                text: text,
+                time: timeStr
             });
-        }
 
-        // Teacher Modal Controls
-        openTeacherBtn.addEventListener('click', () => {
-            renderTeacherLogs();
-            teacherModal.classList.remove('hidden');
-        });
-        closeTeacherModal.addEventListener('click', () => {
-            teacherModal.classList.add('hidden');
-        });
-        document.getElementById('clear-teacher-logs').addEventListener('click', () => {
-            teacherLogs = [];
-            renderTeacherLogs();
-        });
+            inputEl.value = '';
+            renderMessages();
 
-        // Initialize Chat List
-        function renderChatList() {
-            chatListEl.innerHTML = `
-                <div onclick="showChatMobile()" class="flex items-center gap-3 p-3 bg-slate-800/90 border-l-4 border-blue-500 cursor-pointer">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow shrink-0">EN</div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-sm text-slate-200 truncate">English Grammar Bot 🇬🇧</h4>
-                        <p class="text-xs text-blue-400 truncate">онлайн • Репетитор AI</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Handle Window Resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebarEl.classList.remove('hidden');
-                sidebarEl.classList.add('flex');
-                chatWindowEl.classList.remove('hidden');
-                chatWindowEl.classList.add('flex');
-            } else {
-                showChatMobile();
+            // 2. Check Vocabulary Question
+            const vocabCheck = checkVocabularyQuery(text);
+            if (vocabCheck.found) {
+                setTimeout(() => {
+                    chat.messages.push({
+                        id: Date.now() + 1,
+                        sender: 'them',
+                        text: `📖 **Словарь**: Слово **"${vocabCheck.word}"** по-английски будет: **"${vocabCheck.translation}"** ✨\n\nА теперь переведи предложение:\n👉 **"${chat.currentTask.russian}"**`,
+                        time: timeStr
+                    });
+                    renderMessages();
+                }, 400);
+                return;
             }
+
+            // 3. Evaluate Task Sentence
+            const res = evaluateTranslation(text, chat.currentTask);
+            stats.total++;
+
+            if (res.isCorrect) {
+                stats.correct++;
+                stats.streak++;
+            } else {
+                stats.streak = 0;
+            }
+
+            // Log entry for teacher
+            teacherLogs.unshift({
+                time: timeStr,
+                tense: chat.currentTask.tense,
+                form: chat.currentTask.form,
+                russian: chat.currentTask.russian,
+                userAnswer: text,
+                correctAnswer: chat.currentTask.english,
+                status: res.isCorrect ? 'correct' : 'incorrect'
+            });
+
+            // Update Header Stats Badges
+            document.getElementById('stat-correct').textContent = stats.correct;
+            document.getElementById('stat-streak').textContent = stats.streak + ' стрик';
+
+            // Next Task Update
+            chat.currentTask = res.nextTask;
+
+            setTimeout(() => {
+                chat.messages.push({
+                    id: Date.now() + 2,
+                    sender: 'them',
+                    text: `${res.feedback}\n\n📌 **СЛЕДУЮЩЕЕ ЗАДАНИЕ**:\nВремя: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**\n\nПереведи предложение:\n👉 **"${chat.currentTask.russian}"**`,
+                    time: timeStr,
+                    inlineButtons: [
+                        { text: "💡 Подсказка", action: "hint" },
+                        { text: "⏭️ Пропустить", action: "next" },
+                        { text: "📐 Показать правило", action: "rule" }
+                    ]
+                });
+                renderMessages();
+                renderTeacherLogs();
+            }, 500);
         });
 
-        // Initial setup
-        renderChatList();
-        renderMessages();
-        renderTeacherLogs();
-        showChatMobile();
+        // Initialize UI Elements & Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            setupFilterButtons();
+            renderChatList();
+            renderMessages();
+            renderTeacherLogs();
+            startLessonTimer();
+
+            // Mobile Navigation Back Button
+            document.getElementById('back-to-list')?.addEventListener('click', showSidebarMobile);
+
+            // Teacher Modal Listeners
+            const teacherModal = document.getElementById('teacher-modal');
+            const openTeacherBtn = document.getElementById('open-teacher-btn');
+            const openTeacherBtnSidebar = document.getElementById('open-teacher-btn-sidebar');
+            const closeTeacherModal = document.getElementById('close-teacher-modal');
+            const clearLogsBtn = document.getElementById('clear-teacher-logs');
+            const exportBtn = document.getElementById('export-report-btn');
+
+            openTeacherBtn?.addEventListener('click', () => teacherModal?.classList.remove('hidden'));
+            openTeacherBtnSidebar?.addEventListener('click', () => teacherModal?.classList.remove('hidden'));
+            closeTeacherModal?.addEventListener('click', () => teacherModal?.classList.add('hidden'));
+
+            clearLogsBtn?.addEventListener('click', () => {
+                teacherLogs = [];
+                stats = { correct: 0, streak: 0, total: 0 };
+                sessionSeconds = 0;
+                document.getElementById('stat-correct').textContent = '0';
+                document.getElementById('stat-streak').textContent = '0 стрик';
+                updateTimerDisplay();
+                renderTeacherLogs();
+            });
+
+            exportBtn?.addEventListener('click', () => {
+                const reportData = {
+                    student: studentName,
+                    lessonDurationSeconds: sessionSeconds,
+                    accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) + '%' : '100%',
+                    totalCompleted: stats.total,
+                    logs: teacherLogs
+                };
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `report_${studentName}_lesson.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+            });
+
+            // Emoji Picker Drawer Toggle
+            const emojiBtn = document.getElementById('emoji-btn');
+            const emojiPicker = document.getElementById('emoji-picker');
+            emojiBtn?.addEventListener('click', () => emojiPicker?.classList.toggle('hidden'));
+
+            document.querySelectorAll('.emoji-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const input = document.getElementById('message-input');
+                    if (input) input.value += item.textContent;
+                    emojiPicker?.classList.add('hidden');
+                });
+            });
+
+            // Handle Resize for Responsive Layout
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    document.getElementById('sidebar')?.classList.remove('hidden');
+                    document.getElementById('chat-window')?.classList.remove('hidden');
+                    document.getElementById('chat-window')?.classList.add('flex');
+                }
+            });
+        });
     </script>
 </body>
 </html>
