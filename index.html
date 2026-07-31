@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tg: {
+                            bg: '#0f172a',
+                            sidebar: '#1e293b',
+                            header: '#1e293b',
+                            bubbleUser: '#2563eb',
+                            bubbleOther: '#334155',
+                            accent: '#3b82f6',
+                            hover: '#334155',
+                            textMuted: '#94a3b8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.4);
+        }
+
+        /* Telegram Background Pattern */
+        .tg-wallpaper {
+            background-color: #0b141a;
+            background-image: radial-gradient(#1e293b 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .light .tg-wallpaper {
+            background-color: #e2e8f0;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* Message tail styles */
+        .bubble-out::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 10px 10px;
+            border-color: transparent transparent #2563eb transparent;
+        }
+        .bubble-in::before {
+            content: "";
+            position: absolute;
+            left: -6px;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 10px 10px 0;
+            border-color: transparent #334155 transparent transparent;
+        }
+        .light .bubble-in::before {
+            border-color: transparent #ffffff transparent transparent;
+        }
+
+        /* Inline Keyboard Buttons styling */
+        .tg-inline-btn {
+            background-color: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            transition: all 0.2s ease;
+        }
+        .tg-inline-btn:hover {
+            background-color: rgba(37, 99, 235, 0.3);
+            border-color: #3b82f6;
+        }
+
+        /* Waveform Animation */
+        @keyframes pulse-bar {
+            0%, 100% { height: 6px; }
+            50% { height: 18px; }
+        }
+        .animate-wave {
+            animation: pulse-bar 1.2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden flex flex-col justify-center items-center">
+
+    <div id="app" class="w-full h-full max-w-[1600px] flex overflow-hidden shadow-2xl relative bg-slate-900 border border-slate-800">
+        
+        <!-- SIDEBAR (CHATS LIST) -->
+        <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full z-20 transition-all duration-300">
+            <!-- Sidebar Header -->
+            <div class="p-3 bg-slate-900 flex items-center justify-between border-b border-slate-800 gap-2">
+                <button id="menu-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text" id="search-chat" placeholder="Поиск..." 
+                           class="w-full bg-slate-800 text-slate-200 text-sm pl-9 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition placeholder-slate-500">
+                </div>
+            </div>
+
+            <!-- Categories / Folders Tabs -->
+            <div class="flex border-b border-slate-800 text-xs font-semibold px-2 text-slate-400 overflow-x-auto no-scrollbar">
+                <button class="folder-tab active px-4 py-2.5 border-b-2 border-blue-500 text-blue-400 flex items-center gap-1.5 shrink-0" data-folder="all">
+                    <span>Все</span>
+                    <span class="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full" id="total-unread-badge">3</span>
+                </button>
+                <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="personal">
+                    <span>Личные</span>
+                </button>
+                <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="bots">
+                    <span>Боты</span>
+                </button>
+                <button class="folder-tab px-4 py-2.5 border-b-2 border-transparent hover:text-slate-200 flex items-center gap-1.5 shrink-0" data-folder="groups">
+                    <span>Группы</span>
+                </button>
+            </div>
+
+            <!-- Chat List -->
+            <div id="chat-list" class="flex-1 overflow-y-auto divide-y divide-slate-800/40">
+                <!-- Chat items will be populated by JavaScript -->
+            </div>
+
+            <!-- Sidebar Footer Status -->
+            <div class="p-2.5 bg-slate-950/60 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center px-4">
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Telegram Web v2.4</span>
+                </span>
+                <button id="theme-toggle" class="hover:text-slate-300">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CHAT AREA -->
+        <main id="chat-window" class="flex-1 flex flex-col h-full relative bg-slate-950">
+            <!-- Chat Top Header -->
+            <header id="chat-header" class="h-16 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between z-10">
+                <div class="flex items-center gap-3 cursor-pointer" id="header-user-info">
+                    <button id="back-to-list" class="md:hidden w-8 h-8 rounded-full hover:bg-slate-800 text-slate-400 flex items-center justify-center">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="relative">
+                        <div id="header-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-base shadow">
+                            EN
+                        </div>
+                        <span id="header-online-indicator" class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
+                    </div>
+                    <div>
+                        <h2 id="header-name" class="font-semibold text-slate-100 text-sm md:text-base leading-tight">English Grammar Bot 🇬🇧</h2>
+                        <p id="header-status" class="text-xs text-blue-400">онлайн • Репетитор AI</p>
+                    </div>
+                </div>
+
+                <!-- Learning Stats Bar -->
+                <div class="hidden sm:flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50 text-xs">
+                    <div class="flex items-center gap-1.5 text-emerald-400 font-medium">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="stat-correct">0</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-700"></div>
+                    <div class="flex items-center gap-1.5 text-amber-400 font-medium">
+                        <i class="fa-solid fa-fire"></i>
+                        <span id="stat-streak">0 стрик</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-700"></div>
+                    <div class="flex items-center gap-1 text-slate-400">
+                        <span id="active-tense-badge" class="bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded-md font-semibold text-[11px]">
+                            Все времена
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-1 text-slate-400">
+                    <button id="reset-stats-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 hover:text-amber-400 flex items-center justify-center transition" title="Сбросить счет">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <button id="header-menu-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 hover:text-slate-200 flex items-center justify-center transition" title="Опции">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tense Toolbar Panel -->
+            <div id="grammar-bar" class="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex flex-wrap gap-2 items-center text-xs overflow-x-auto">
+                <span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider shrink-0 mr-1">Время:</span>
+                <button class="tense-selector-btn active bg-blue-600 text-white px-2.5 py-1 rounded-lg transition" data-tense="ALL">
+                    🔀 Все Времена
+                </button>
+                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Present Simple">
+                    Present Simple
+                </button>
+                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Present Continuous">
+                    Present Continuous
+                </button>
+                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Past Simple">
+                    Past Simple
+                </button>
+                <button class="tense-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition" data-tense="Future Simple">
+                    Future Simple
+                </button>
+
+                <div class="h-4 w-px bg-slate-700 mx-1"></div>
+
+                <span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider shrink-0 mr-1">Форма:</span>
+                <button class="form-selector-btn active bg-indigo-600 text-white px-2 py-1 rounded-lg transition" data-form="ALL">
+                    ⚡ Все (+,-,?)
+                </button>
+                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Affirmative">
+                    + Утвердительная
+                </button>
+                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Negative">
+                    - Отрицательная
+                </button>
+                <button class="form-selector-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition" data-form="Interrogative">
+                    ? Вопрос
+                </button>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 tg-wallpaper relative">
+                <!-- Date Header Badge -->
+                <div class="flex justify-center my-3 sticky top-2 z-10">
+                    <span class="bg-slate-900/80 backdrop-blur text-slate-400 text-xs px-3 py-1 rounded-full shadow border border-slate-800/50">
+                        Сегодня
+                    </span>
+                </div>
+
+                <!-- Messages inserted dynamically here -->
+            </div>
+
+            <!-- Emoji Picker Drawer (Hidden by default) -->
+            <div id="emoji-picker" class="hidden absolute bottom-20 left-4 z-30 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-3 w-72 grid grid-cols-6 gap-2 text-xl">
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">😊</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">😂</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">👍</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">❤️</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🔥</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🎉</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">😎</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🙏</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🚀</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">🤖</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">💡</span>
+                <span class="emoji-item hover:bg-slate-800 p-1 rounded cursor-pointer text-center">✨</span>
+            </div>
+
+            <!-- Input Area Footer -->
+            <footer class="p-3 bg-slate-900 border-t border-slate-800 relative z-10">
+                <form id="message-form" class="flex items-center gap-2 max-w-4xl mx-auto">
+                    <!-- Attachment button -->
+                    <button type="button" id="attach-btn" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 flex items-center justify-center transition">
+                        <i class="fa-solid fa-paperclip text-lg"></i>
+                    </button>
+                    <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc">
+
+                    <!-- Message Text Input Box -->
+                    <div class="flex-1 bg-slate-800/80 rounded-2xl flex items-center px-3 border border-slate-700/50 focus-within:border-blue-500 transition">
+                        <button type="button" id="emoji-btn" class="text-slate-400 hover:text-amber-400 mr-2 transition">
+                            <i class="fa-regular fa-face-smile text-xl"></i>
+                        </button>
+                        <input type="text" id="message-input" placeholder="Написать сообщение..." 
+                               autocomplete="off"
+                               class="w-full bg-transparent text-slate-100 py-3 text-sm focus:outline-none placeholder-slate-500">
+                    </div>
+
+                    <!-- Voice / Send Button Switch -->
+                    <button type="submit" id="send-btn" class="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition shadow-lg shadow-blue-600/30">
+                        <i id="send-icon" class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                    <button type="button" id="voice-btn" class="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition hidden">
+                        <i class="fa-solid fa-microphone text-base"></i>
+                    </button>
+                </form>
+            </footer>
+        </main>
+
+        <!-- User Details Panel (Drawer) -->
+        <div id="profile-drawer" class="hidden absolute top-0 right-0 w-80 h-full bg-slate-900 border-l border-slate-800 z-30 flex flex-col shadow-2xl transition-all">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-slate-200">Информация</h3>
+                <button id="close-profile" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 text-center border-b border-slate-800">
+                <div id="drawer-avatar" class="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white text-2xl font-bold flex items-center justify-center mx-auto mb-3 shadow-lg">
+                    AI
+                </div>
+                <h3 id="drawer-name" class="font-bold text-lg text-slate-100">Telegram AI Бот</h3>
+                <p id="drawer-username" class="text-xs text-blue-400 mb-2">@telegram_ai_bot</p>
+                <p id="drawer-bio" class="text-xs text-slate-400">Интеллектуальный виртуальный ассистент прямо в Telegram.</p>
+            </div>
+            <div class="p-4 space-y-4 text-sm flex-1 overflow-y-auto">
+                <div>
+                    <span class="text-xs text-slate-500 block mb-1">О себе</span>
+                    <p class="text-slate-300 text-xs" id="drawer-desc">Отвечает на любые вопросы, генерирует идеи и поддерживает диалог 24/7.</p>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-500 block mb-1">Медиа и файлы</span>
+                    <div class="grid grid-cols-3 gap-2 mt-2">
+                        <div class="bg-slate-800 h-16 rounded-lg flex items-center justify-center text-slate-600 text-xs">Фото 1</div>
+                        <div class="bg-slate-800 h-16 rounded-lg flex items-center justify-center text-slate-600 text-xs">Фото 2</div>
+                        <div class="bg-slate-800 h-16 rounded-lg flex items-center justify-center text-slate-600 text-xs">Файл.pdf</div>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-slate-800 space-y-2">
+                    <button class="w-full text-left text-red-400 hover:bg-slate-800 p-2 rounded flex items-center gap-2 text-xs font-semibold">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <span>Заблокировать контакт</span>
+                    </button>
+                    <button class="w-full text-left text-red-400 hover:bg-slate-800 p-2 rounded flex items-center gap-2 text-xs font-semibold">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Очистить историю</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // User practice stats
+        let stats = {
+            correct: 0,
+            streak: 0,
+            total: 0
+        };
+
+        let activeTenseSetting = "ALL";
+        let activeFormSetting = "ALL";
+
+        // Mock Chat Data Structure
+        const chatsData = [
+            {
+                id: 'english-bot',
+                name: 'English Grammar Bot 🇬🇧',
+                username: '@english_tutor_bot',
+                avatar: 'EN',
+                bgGradient: 'from-blue-600 to-indigo-500',
+                status: 'онлайн • Репетитор AI',
+                category: 'bots',
+                unread: 0,
+                typing: false,
+                currentTask: {
+                    russian: "Я читаю интересную книгу каждый вечер.",
+                    english: "I read an interesting book every evening.",
+                    tense: "Present Simple",
+                    form: "Affirmative (+)"
+                },
+                messages: [
+                    { 
+                        id: 1, 
+                        sender: 'them', 
+                        text: `👋 **Привет! Я твой персональный репетитор по английскому языку.**
+
+🎯 **Наша цель**: довести до автоматизма времена:
+• **Present Simple** (Настоящее простое)
+• **Present Continuous** (Настоящее длительное)
+• **Past Simple** (Прошедшее простое)
+• **Future Simple** (Будущее простое)
+в **утвердительных (+)**, **отрицательных (-)** и **вопросительных (?)** формах!
+
+---
+📌 **ПЕРВОЕ ЗАДАНИЕ**:
+Время: **Present Simple** | Форма: **Утвердительная (+)**
+
+Переведи предложение на английский:
+👉 **"Я читаю интересную книгу каждый вечер."**
+
+*(Напиши ответ в чат)*`, 
+                        time: '10:42', 
+                        status: 'read',
+                        inlineButtons: [
+                            { text: "💡 Подсказка", action: "hint" },
+                            { text: "⏭️ Пропустить", action: "next" },
+                            { text: "📐 Показать правило", action: "rule" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'maria',
+                name: 'Мария (Коллега) 🌸',
+                username: '@maria_design',
+                avatar: 'М',
+                bgGradient: 'from-pink-500 to-rose-400',
+                status: 'была недавно',
+                category: 'personal',
+                unread: 1,
+                messages: [
+                    { id: 1, sender: 'them', text: 'Привет! До скорой встречи на занятии по английскому!', time: '09:15', status: 'read' }
+                ]
+            }
+        ];
+
+        // Active State
+        let activeChatId = 'english-bot';
+        let currentFolder = 'all';
+
+        // DOM Elements
+        const chatListEl = document.getElementById('chat-list');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const headerName = document.getElementById('header-name');
+        const headerStatus = document.getElementById('header-status');
+        const headerAvatar = document.getElementById('header-avatar');
+        const headerOnlineIndicator = document.getElementById('header-online-indicator');
+        const emojiBtn = document.getElementById('emoji-btn');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const attachBtn = document.getElementById('attach-btn');
+        const fileInput = document.getElementById('file-input');
+        const profileDrawer = document.getElementById('profile-drawer');
+        const headerUserInfo = document.getElementById('header-user-info');
+        const closeProfileBtn = document.getElementById('close-profile');
+        const drawerAvatar = document.getElementById('drawer-avatar');
+        const drawerName = document.getElementById('drawer-name');
+        const drawerUsername = document.getElementById('drawer-username');
+
+        // Gemini API Handler for English Tutor Evaluation
+        async function evaluateTranslationWithGemini(userTranslation, currentTask) {
+            const systemPrompt = `Ты — профессиональный, доброжелательный репетитор по английскому языку в Telegram-боте.
+Твоя задача — проверять перевод предложений с русского на английский для освоения времен:
+- Present Simple
+- Present Continuous
+- Past Simple
+- Future Simple
+Формы: Утвердительная (+), Отрицательная (-), Вопросительная (?).
+
+Текущая задача для ученика:
+- Предложение на русском: "${currentTask.russian}"
+- Целевое время: ${currentTask.tense}
+- Форма: ${currentTask.form}
+- Основной правильный перевод: "${currentTask.english}"
+- Настройки активного времени пользователя: ${activeTenseSetting}
+- Настройки формы пользователя: ${activeFormSetting}
+
+ВАЖНО: Ученик может отправить либо свой вариант перевода предложения, либо СПРОСИТЬ ПЕРЕВОД КОНКРЕТНОГО СЛОВА / ФРАЗЫ (например: "а как будет интересный?", "как сказать машина?", "что значит book?", "как по-английски читать?").
+
+Инструкции для твоего ответа:
+1. Твой ответ ДОЛЖЕН быть в формате JSON:
+{
+  "isWordQuestion": true или false (поставь true, если ученик спросил перевод слова или задал вопрос по лексике/грамматике),
+  "isCorrect": true или false (если это был вопрос по слову - ставь false),
+  "feedback": "Текст ответа на русском с Telegram Markdown (**жирный**, inline-код). Если это вопрос по слову: назови перевод слова, транскрипцию или пример и поддержи ученика. В конце напомни текущее предложение для перевода. Если это ответ на задание: похвали или объясни ошибку.",
+  "nextTask": {
+     "russian": "Предложение на русском",
+     "english": "Перевод на английский",
+     "tense": "Present Simple | Present Continuous | Past Simple | Future Simple",
+     "form": "Affirmative (+) | Negative (-) | Interrogative (?)"
+  }
+}
+
+Примечание для "nextTask":
+- Если isWordQuestion = true, верни В ТОЧНОСТИ текущее задание ("${currentTask.russian}"), чтобы ученик мог продолжить переводить его!
+- Если isWordQuestion = false, сгенерируй новое предложение с повседневной лексикой с учетом настроек пользователя (${activeTenseSetting}, ${activeFormSetting}).
+`;
+
+            const userQuery = `Сообщение ученика: "${userTranslation}"`;
+            
+            // Retry logic with exponential backoff
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const data = await response.json();
+                    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (responseText) {
+                        return JSON.parse(responseText);
+                    }
+                } catch (e) {
+                    if (attempt === 2) {
+                        console.error("Gemini API Error, falling back to built-in logic:", e);
+                    }
+                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
+                }
+            }
+
+            // Fallback Offline Generator if network issue
+            return fallbackCheck(userTranslation, currentTask);
+        }
+
+        // Offline fallback logic
+        function fallbackCheck(userTranslation, currentTask) {
+            const cleanUser = userTranslation.trim().toLowerCase();
+            const isQuestion = cleanUser.includes('как будет') || cleanUser.includes('как сказать') || cleanUser.includes('перевод') || cleanUser.includes('по-английски') || cleanUser.includes('что значит');
+
+            if (isQuestion) {
+                // Quick inline dictionary for common prompt words
+                let wordTranslation = "слова / выражения";
+                if (cleanUser.includes("интересный") || cleanUser.includes("интересно")) wordTranslation = "«интересный» — **interesting** [ˈɪntrəstɪŋ]";
+                else if (cleanUser.includes("книга") || cleanUser.includes("книгу")) wordTranslation = "«книга» — **book** [bʊk]";
+                else if (cleanUser.includes("читать") || cleanUser.includes("читаю")) wordTranslation = "«читать» — **read** [riːd]";
+                else if (cleanUser.includes("каждый") || cleanUser.includes("каждую")) wordTranslation = "«каждый» — **every** [ˈevri]";
+                else if (cleanUser.includes("вечер")) wordTranslation = "«вечер» — **evening** [ˈiːvnɪŋ]";
+
+                return {
+                    isWordQuestion: true,
+                    isCorrect: false,
+                    feedback: `📖 **Мини-словарь:**\nПеревод ${wordTranslation}.\n\n💡 *Теперь попробуй собрать всё предложение:* **"${currentTask.russian}"**`,
+                    nextTask: currentTask
+                };
+            }
+
+            const cleanUserNoPunct = cleanUser.replace(/[.,!?]/g, '');
+            const cleanTarget = currentTask.english.trim().toLowerCase().replace(/[.,!?]/g, '');
+
+            const isCorrect = cleanUserNoPunct === cleanTarget || cleanUserNoPunct.includes(cleanTarget);
+
+            const sampleTasks = [
+                { russian: "Она не работает по субботам.", english: "She does not work on Saturdays.", tense: "Present Simple", form: "Negative (-)" },
+                { russian: "Ты сейчас смотришь фильм?", english: "Are you watching a movie now?", tense: "Present Continuous", form: "Interrogative (?)" },
+                { russian: "Мы ходили в парк вчера.", english: "We went to the park yesterday.", tense: "Past Simple", form: "Affirmative (+)" },
+                { russian: "Они не купят эту машину завтра.", english: "They will not buy this car tomorrow.", tense: "Future Simple", form: "Negative (-)" },
+                { russian: "Что ты обычно ешь на завтрак?", english: "What do you usually eat for breakfast?", tense: "Present Simple", form: "Interrogative (?)" }
+            ];
+
+            const nextTask = sampleTasks[Math.floor(Math.random() * sampleTasks.length)];
+
+            if (isCorrect) {
+                return {
+                    isWordQuestion: false,
+                    isCorrect: true,
+                    feedback: `🎉 **Отлично! Всё верно!**\n\nТвой перевод: "${userTranslation}"\nПравильная конструкция: **${currentTask.english}**\n\nМолодец! Двигаемся дальше.`,
+                    nextTask: nextTask
+                };
+            } else {
+                return {
+                    isWordQuestion: false,
+                    isCorrect: false,
+                    feedback: `❌ **Есть небольшая ошибка.**\n\nТвой вариант: "${userTranslation}"\nПравильный перевод: **${currentTask.english}**\n\n💡 *Обрати внимание на время (${currentTask.tense}) и вспомогательные глаголы.* Не расстраивайся, попробуй следующее задание!`,
+                    nextTask: nextTask
+                };
+            }
+        }
+
+        function formatMarkdown(text) {
+            if (!text) return '';
+            let formatted = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-blue-300 px-1 py-0.5 rounded text-xs font-mono">$1</code>')
+                .replace(/\n/g, '<br>');
+            return formatted;
+        }
+
+        // Render Active Messages
+        function renderMessages() {
+            const chat = chatsData.find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            messagesContainer.innerHTML = `
+                <div class="flex justify-center my-3 sticky top-2 z-10">
+                    <span class="bg-slate-900/80 backdrop-blur text-slate-400 text-xs px-3 py-1 rounded-full shadow border border-slate-800/50">
+                        Сегодня
+                    </span>
+                </div>
+            `;
+
+            chat.messages.forEach(msg => {
+                const isMe = msg.sender === 'me';
+
+                const msgWrapper = document.createElement('div');
+                msgWrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3 group`;
+
+                let innerHTML = '';
+
+                if (msg.image) {
+                    innerHTML = `
+                        <div class="relative max-w-[85%] md:max-w-sm p-1.5 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-br-xs bubble-out' : 'bg-slate-800 text-slate-100 rounded-bl-xs bubble-in'} shadow-md">
+                            <img src="${msg.image}" alt="attachment" class="rounded-xl w-full object-cover max-h-60 mb-1">
+                            ${msg.text ? `<p class="text-sm px-1 mb-1">${formatMarkdown(msg.text)}</p>` : ''}
+                            <div class="flex justify-end items-center gap-1 text-[10px] opacity-75 px-1">
+                                <span>${msg.time}</span>
+                                ${isMe ? '<i class="fa-solid fa-check-double text-blue-200"></i>' : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    innerHTML = `
+                        <div class="relative max-w-[85%] md:max-w-lg px-4 py-2.5 rounded-2xl ${isMe ? 'bg-blue-600 text-white rounded-br-none bubble-out' : 'bg-slate-800 text-slate-100 rounded-bl-none bubble-in'} shadow-md text-sm leading-relaxed">
+                            <div>${formatMarkdown(msg.text)}</div>
+                            <div class="flex justify-end items-center gap-1 text-[10px] opacity-75 mt-1 -mr-1">
+                                <span>${msg.time}</span>
+                                ${isMe ? '<i class="fa-solid fa-check-double text-blue-200"></i>' : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                msgWrapper.innerHTML = innerHTML;
+
+                // Render Telegram Inline Keyboard Buttons if present
+                if (!isMe && msg.inlineButtons && msg.inlineButtons.length > 0) {
+                    const btnContainer = document.createElement('div');
+                    btnContainer.className = "flex flex-wrap gap-1.5 mt-2 max-w-lg";
+                    msg.inlineButtons.forEach(btn => {
+                        const buttonEl = document.createElement('button');
+                        buttonEl.className = "tg-inline-btn text-xs text-blue-300 font-medium px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm";
+                        buttonEl.innerHTML = btn.text;
+                        buttonEl.onclick = () => handleInlineAction(btn.action);
+                        btnContainer.appendChild(buttonEl);
+                    });
+                    msgWrapper.appendChild(btnContainer);
+                }
+
+                messagesContainer.appendChild(msgWrapper);
+            });
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleInlineAction(action) {
+            const chat = chatsData.find(c => c.id === 'english-bot');
+            if (!chat || !chat.currentTask) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            if (action === 'hint') {
+                const words = chat.currentTask.english.split(' ');
+                const hintText = `💡 **Подсказка**: Первые слова предложения: **"${words.slice(0, 2).join(' ')}..."**\nВремя: **${chat.currentTask.tense}**`;
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: hintText,
+                    time: timeStr
+                });
+                renderMessages();
+            } else if (action === 'next') {
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: `⏭️ **Задание пропущено.**\nПравильный ответ был: **"${chat.currentTask.english}"**\n\nЗагружаю следующее задание...`,
+                    time: timeStr
+                });
+                renderMessages();
+                generateNextSentenceOnly(chat);
+            } else if (action === 'rule') {
+                const ruleText = getGrammarRuleSummary(chat.currentTask.tense);
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: ruleText,
+                    time: timeStr
+                });
+                renderMessages();
+            }
+        }
+
+        // Summary of grammar rules for instant inline view
+        function getGrammarRuleSummary(tense) {
+            switch(tense) {
+                case 'Present Simple':
+                    return `📚 **ПРАВИЛО: Present Simple**\n• Для регулярных действий, привычек и фактов.\n• Утверждение: V / V-s (he, she, it).\n• Отрицание: don't / doesn't + V.\n• Вопрос: Do / Does + подлежащее + V?`;
+                case 'Present Continuous':
+                    return `📚 **ПРАВИЛО: Present Continuous**\n• Для действий, происходящих прямо сейчас.\n• Утверждение: am / is / are + V-ing.\n• Отрицание: am not / isn't / aren't + V-ing.\n• Вопрос: Am / Is / Are + подлежащее + V-ing?`;
+                case 'Past Simple':
+                    return `📚 **ПРАВИЛО: Past Simple**\n• Для завершенных действий в прошлом.\n• Утверждение: V2 / V-ed.\n• Отрицание: didn't + V (глагол в 1-й форме!).\n• Вопрос: Did + подлежащее + V?`;
+                case 'Future Simple':
+                    return `📚 **ПРАВИЛО: Future Simple**\n• Для спонтанных решений и предсказаний будущего.\n• Утверждение: will + V.\n• Отрицание: will not (won't) + V.\n• Вопрос: Will + подлежащее + V?`;
+                default:
+                    return `📚 **Общее правило:** Соблюдайте порядок слов: Подлежащее + Вспомогательный глагол + Смысловой глагол.`;
+            }
+        }
+
+        // Send Message Handler
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            const chat = chatsData.find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            // Push User Message
+            chat.messages.push({
+                id: Date.now(),
+                sender: 'me',
+                text: text,
+                time: timeStr,
+                status: 'sent'
+            });
+
+            messageInput.value = '';
+            renderMessages();
+            renderChatList();
+
+            // Handle English Bot logic
+            if (chat.id === 'english-bot') {
+                chat.typing = true;
+                headerStatus.textContent = 'проверяет ответ...';
+                renderChatList();
+
+                // Call Gemini API to evaluate
+                const result = await evaluateTranslationWithGemini(text, chat.currentTask);
+
+                chat.typing = false;
+                headerStatus.textContent = chat.status;
+
+                // Update Stats ONLY if it was an actual translation attempt (not a word question)
+                if (!result.isWordQuestion) {
+                    stats.total++;
+                    if (result.isCorrect) {
+                        stats.correct++;
+                        stats.streak++;
+                    } else {
+                        stats.streak = 0;
+                    }
+                    updateStatsUI();
+                }
+
+                // Save next task
+                if (result.nextTask) {
+                    chat.currentTask = result.nextTask;
+                }
+
+                // Format bot response message
+                let responseText = "";
+                if (result.isWordQuestion) {
+                    responseText = `${result.feedback}`;
+                } else {
+                    responseText = `${result.feedback}
+
+---
+📌 **СЛЕДУЮЩЕЕ ЗАДАНИЕ**:
+Время: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**
+
+Переведи предложение:
+👉 **"${chat.currentTask.russian}"**`;
+                }
+
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: responseText,
+                    time: timeStr,
+                    inlineButtons: [
+                        { text: "💡 Подсказка", action: "hint" },
+                        { text: "⏭️ Пропустить", action: "next" },
+                        { text: "📐 Правило", action: "rule" }
+                    ]
+                });
+
+                renderMessages();
+                renderChatList();
+            } else {
+                // Other general chats fallback
+                simulateBotResponse(chat);
+            }
+        });
+
+        // Generate standalone next sentence
+        async function generateNextSentenceOnly(chat) {
+            chat.typing = true;
+            headerStatus.textContent = 'генерирует задание...';
+            
+            const prompt = `Сгенерируй новое практическое задание по английскому языку.
+Выбранное время: ${activeTenseSetting}
+Выбранная форма: ${activeFormSetting}
+Используй бытовую простую лексику. Возвращай только JSON с новым заданием.`;
+
+            const res = await fallbackCheck("", { russian: "", english: "", tense: activeTenseSetting, form: activeFormSetting });
+            
+            chat.typing = false;
+            headerStatus.textContent = chat.status;
+            chat.currentTask = res.nextTask;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            chat.messages.push({
+                id: Date.now(),
+                sender: 'them',
+                text: `📌 **НОВОЕ ЗАДАНИЕ**:
+Время: **${chat.currentTask.tense}** | Форма: **${chat.currentTask.form}**
+
+Переведи предложение:
+👉 **"${chat.currentTask.russian}"**`,
+                time: timeStr,
+                inlineButtons: [
+                    { text: "💡 Подсказка", action: "hint" },
+                    { text: "⏭️ Пропустить", action: "next" },
+                    { text: "📐 Правило", action: "rule" }
+                ]
+            });
+            renderMessages();
+        }
+
+        // Update Header Stats Bar
+        function updateStatsUI() {
+            document.getElementById('stat-correct').textContent = stats.correct;
+            document.getElementById('stat-streak').textContent = `${stats.streak} стрик 🔥`;
+        }
+
+        // Reset stats button
+        document.getElementById('reset-stats-btn').addEventListener('click', () => {
+            stats.correct = 0;
+            stats.streak = 0;
+            stats.total = 0;
+            updateStatsUI();
+        });
+
+        document.querySelectorAll('.tense-selector-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tense-selector-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-blue-600', 'text-white');
+                    b.classList.add('bg-slate-800', 'text-slate-300');
+                });
+                btn.classList.add('active', 'bg-blue-600', 'text-white');
+                btn.classList.remove('bg-slate-800', 'text-slate-300');
+
+                activeTenseSetting = btn.getAttribute('data-tense');
+                document.getElementById('active-tense-badge').textContent = activeTenseSetting === 'ALL' ? 'Все времена' : activeTenseSetting;
+                
+                // Prompt user about mode change
+                const chat = chatsData.find(c => c.id === 'english-bot');
+                if (chat) {
+                    const now = new Date();
+                    const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                    chat.messages.push({
+                        id: Date.now(),
+                        sender: 'them',
+                        text: `⚙️ **Режим изменён!**\nВыбранное время: **${activeTenseSetting}**.\nГенерирую новое предложение...`,
+                        time: timeStr
+                    });
+                    renderMessages();
+                    generateNextSentenceOnly(chat);
+                }
+            });
+        });
+
+        document.querySelectorAll('.form-selector-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.form-selector-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-indigo-600', 'text-white');
+                    b.classList.add('bg-slate-800', 'text-slate-300');
+                });
+                btn.classList.add('active', 'bg-indigo-600', 'text-white');
+                btn.classList.remove('bg-slate-800', 'text-slate-300');
+
+                activeFormSetting = btn.getAttribute('data-form');
+            });
+        });
+
+        // Select Active Chat
+        function selectChat(id) {
+            activeChatId = id;
+            const chat = chatsData.find(c => c.id === id);
+            if (!chat) return;
+
+            // Reset Unread
+            chat.unread = 0;
+
+            // Header Update
+            headerName.textContent = chat.name;
+            headerStatus.textContent = chat.typing ? 'печатает...' : chat.status;
+            headerAvatar.textContent = chat.avatar;
+            headerAvatar.className = `w-10 h-10 rounded-full bg-gradient-to-tr ${chat.bgGradient} flex items-center justify-center text-white font-bold text-base shadow`;
+            headerOnlineIndicator.style.display = chat.status.includes('онлайн') ? 'block' : 'none';
+
+            // Drawer Info Update
+            drawerAvatar.textContent = chat.avatar;
+            drawerAvatar.className = `w-20 h-20 rounded-full bg-gradient-to-tr ${chat.bgGradient} text-white text-2xl font-bold flex items-center justify-center mx-auto mb-3 shadow-lg`;
+            drawerName.textContent = chat.name;
+            drawerUsername.textContent = chat.username;
+
+            renderChatList();
+            renderMessages();
+
+            // Mobile view toggle
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            }
+        }
+
+        // Standard Bot Response Simulation for secondary contacts
+        function simulateBotResponse(chat) {
+            chat.typing = true;
+            if (chat.id === activeChatId) {
+                headerStatus.textContent = 'печатает...';
+            }
+            renderChatList();
+
+            setTimeout(() => {
+                chat.typing = false;
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'them',
+                    text: "Спасибо за сообщение! Увидимся на занятии!",
+                    time: timeStr,
+                    status: 'read'
+                });
+
+                if (chat.id === activeChatId) {
+                    headerStatus.textContent = chat.status;
+                    renderMessages();
+                } else {
+                    chat.unread += 1;
+                }
+                renderChatList();
+            }, 1200);
+        }
+
+        // Render Left Sidebar Chats
+        function renderChatList() {
+            chatListEl.innerHTML = '';
+            
+            const searchVal = document.getElementById('search-chat').value.toLowerCase();
+
+            const filteredChats = chatsData.filter(chat => {
+                const matchesFolder = currentFolder === 'all' || chat.category === currentFolder;
+                const matchesSearch = chat.name.toLowerCase().includes(searchVal) || chat.username.toLowerCase().includes(searchVal);
+                return matchesFolder && matchesSearch;
+            });
+
+            filteredChats.forEach(chat => {
+                const lastMsg = chat.messages[chat.messages.length - 1];
+                const isActive = chat.id === activeChatId;
+
+                const chatItem = document.createElement('div');
+                chatItem.className = `flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-800/60 transition ${isActive ? 'bg-slate-800/90 border-l-4 border-blue-500' : ''}`;
+                chatItem.onclick = () => selectChat(chat.id);
+
+                chatItem.innerHTML = `
+                    <div class="relative shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr ${chat.bgGradient} flex items-center justify-center text-white font-bold shadow text-base">
+                            ${chat.avatar}
+                        </div>
+                        ${chat.status.includes('онлайн') ? '<span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>' : ''}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h4 class="font-semibold text-sm text-slate-200 truncate">${chat.name}</h4>
+                            <span class="text-[11px] text-slate-500 shrink-0">${lastMsg ? lastMsg.time : ''}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <p class="truncate text-slate-400 pr-2">
+                                ${chat.typing ? '<span class="text-blue-400 animate-pulse font-medium">проверяет...</span>' : (lastMsg ? (lastMsg.sender === 'me' ? '<span class="text-slate-500">Вы: </span>' : '') + lastMsg.text.replace(/[*_`]/g, '') : 'Нет сообщений')}
+                            </p>
+                            ${chat.unread > 0 ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center shrink-0">${chat.unread}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                chatListEl.appendChild(chatItem);
+            });
+        }
+
+        // Emoji Picker Toggle
+        emojiBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPicker.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('.emoji-item').forEach(emoji => {
+            emoji.addEventListener('click', () => {
+                messageInput.value += emoji.textContent;
+                emojiPicker.classList.add('hidden');
+                messageInput.focus();
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+                emojiPicker.classList.add('hidden');
+            }
+        });
+
+        // File Attachment Simulation
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const chat = chatsData.find(c => c.id === activeChatId);
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+                chat.messages.push({
+                    id: Date.now(),
+                    sender: 'me',
+                    text: `Отправлен файл: ${file.name}`,
+                    image: file.type.startsWith('image/') ? evt.target.result : null,
+                    time: timeStr,
+                    status: 'sent'
+                });
+
+                renderMessages();
+                renderChatList();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Folder Tabs Filter
+        document.querySelectorAll('.folder-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.folder-tab').forEach(t => {
+                    t.classList.remove('active', 'border-blue-500', 'text-blue-400');
+                    t.classList.add('border-transparent', 'text-slate-400');
+                });
+                tab.classList.add('active', 'border-blue-500', 'text-blue-400');
+                tab.classList.remove('border-transparent', 'text-slate-400');
+
+                currentFolder = tab.getAttribute('data-folder');
+                renderChatList();
+            });
+        });
+
+        // Search Input Filter
+        document.getElementById('search-chat').addEventListener('input', renderChatList);
+
+        // Profile Drawer Toggle
+        headerUserInfo.addEventListener('click', () => {
+            profileDrawer.classList.remove('hidden');
+        });
+        closeProfileBtn.addEventListener('click', () => {
+            profileDrawer.classList.add('hidden');
+        });
+
+        // Mobile back button
+        document.getElementById('back-to-list').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('-translate-x-full');
+        });
+
+        // Theme Toggle (Light / Dark)
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-toggle').querySelector('i');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                icon.className = 'fa-solid fa-sun';
+            }
+        });
+
+        // Initial Load
+        selectChat('english-bot');
+    </script>
+</body>
+</html>
